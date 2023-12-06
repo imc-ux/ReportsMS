@@ -26,7 +26,6 @@ function onBtnBackClickHandler() {
 }
 
 function onBtnSaveClickHandler() {
-  console.log(combinations)
 }
 
 async function onBtnAddLineClickHandler() {
