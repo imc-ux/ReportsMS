@@ -21,20 +21,27 @@ export default {
           {
             path: '',
             name: 'template',
+            props: true,
             component: resolve(__dirname, 'pages/template/'),
+          },
+          {
+            path: '',
+            name: 'templateDetail',
+            props: true,
+            component: resolve(__dirname, 'pages/templateDetail/'),
           },
         ]
       );
     },
   },
   css: ['element-plus/dist/index.css'],
-  modules: [
-    [
-      '@pinia/nuxt',
-      {
-        autoImports: ['defineStore', ['defineStore', 'definePiniaStore']],
-      },
-    ],
-  ],
+  // modules: [
+  //   [
+  //     '@pinia/nuxt',
+  //     {
+  //       autoImports: ['defineStore', ['defineStore', 'definePiniaStore']],
+  //     },
+  //   ],
+  // ],
   ssr: false,
 };
