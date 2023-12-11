@@ -1,0 +1,214 @@
+{
+  "resolvedId": "E:/gitProject/ReportsMS/components/Button.vue",
+  "transforms": [
+    {
+      "name": "vite:load-fallback",
+      "result": "<script lang=\"ts\" setup>\r\nimport { ElButton, ElIcon } from 'element-plus';\r\n\r\ninterface Props {\r\n  btnIcon?: any;\r\n  disabled?: boolean;\r\n  showIcon?: boolean;\r\n}\r\n\r\nconst props = withDefaults(defineProps<Props>(), {\r\n  btnIcon: null,\r\n  disabled: false,\r\n  showIcon: true,\r\n});\r\n\r\n</script>\r\n\r\n<template>\r\n  <el-button class=\"btn\" :disabled=\"props.disabled\">\r\n    <slot />\r\n    <el-icon v-if=\"props.showIcon\" class=\"el-icon--right\">\r\n      <props.btnIcon /> \r\n    </el-icon>\r\n  </el-button>\r\n</template>\r\n\r\n<style>\r\n.btn {\r\n  color: #08adaa;\r\n  border-color: #08adaa;\r\n  margin-bottom: 4px;\r\n  font-size: 13px;\r\n  font-weight: 400;\r\n  font-family: \"Helvetica Neue\", Helvetica, Roboto, Arial, sans-serif, 微软雅黑;\r\n  margin-top: 5px;\r\n  border: 1px solid #08adaa;\r\n  background-color: #fff;\r\n  height: 30px;\r\n  width: 100px;\r\n  min-height: 0rem;\r\n  border-radius: 0;\r\n}\r\n\r\n.btn:hover {\r\n  color: #fff;\r\n  border-color: #08adaa;\r\n  margin-bottom: 4px;\r\n  font-size: 13px;\r\n  font-weight: 400;\r\n  font-family: \"Helvetica Neue\", Helvetica, Roboto, Arial, sans-serif, 微软雅黑;\r\n  margin-top: 5px;\r\n  border: 1px solid #08adaa;\r\n  background-color: #08adaa;\r\n  height: 30px;\r\n  width: 100px;\r\n  min-height: 0rem;\r\n  border-radius: 0;\r\n}\r\n\r\n.el-button {\r\n  --el-button-hover-text-color: #08adaa;\r\n  --el-button-hover-bg-color: #fff;\r\n  --el-button-hover-border-color: #08adaa;\r\n}\r\n\r\n.el-button+.el-button {\r\n  margin-left: 3px;\r\n}\r\n</style>\r\n",
+      "start": 1701916799506,
+      "end": 1701916799613,
+      "sourcemaps": null
+    },
+    {
+      "name": "nuxt:layer-aliasing",
+      "start": 1701916799613,
+      "end": 1701916799613,
+      "order": "pre"
+    },
+    {
+      "name": "nuxt:server-devonly:transform",
+      "start": 1701916799613,
+      "end": 1701916799613,
+      "order": "pre"
+    },
+    {
+      "name": "nuxt:client-fallback-auto-id",
+      "start": 1701916799614,
+      "end": 1701916799614,
+      "order": "pre"
+    },
+    {
+      "name": "vite:css",
+      "start": 1701916799614,
+      "end": 1701916799614,
+      "order": "normal"
+    },
+    {
+      "name": "vite:esbuild",
+      "start": 1701916799614,
+      "end": 1701916799614,
+      "order": "normal"
+    },
+    {
+      "name": "vite:json",
+      "start": 1701916799614,
+      "end": 1701916799614,
+      "order": "normal"
+    },
+    {
+      "name": "vite:worker",
+      "start": 1701916799614,
+      "end": 1701916799614,
+      "order": "normal"
+    },
+    {
+      "name": "vite:vue",
+      "result": "import _sfc_main from \"E:/gitProject/ReportsMS/components/Button.vue?vue&type=script&setup=true&lang.ts\";\nexport * from \"E:/gitProject/ReportsMS/components/Button.vue?vue&type=script&setup=true&lang.ts\";\nimport \"E:/gitProject/ReportsMS/components/Button.vue?vue&type=style&index=0&lang.css\";\nexport default _sfc_main;\n",
+      "start": 1701916799614,
+      "end": 1701916800339,
+      "order": "normal",
+      "sourcemaps": {
+        "mappings": ""
+      }
+    },
+    {
+      "name": "vite:vue-jsx",
+      "start": 1701916800339,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "replace",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:remove-plugin-metadata",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:chunk-error",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:components:imports",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "replace",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "ssr-styles",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:define",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:css-post",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:build-html",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:worker-import-meta-url",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:asset-import-meta-url",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "commonjs",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:dynamic-import-vars",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "vite:import-glob",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:composable-keys",
+      "start": 1701916800340,
+      "end": 1701916800340,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:imports-transform",
+      "start": 1701916800340,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "unctx:transform",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:pages-macros-transform",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:runtime-paths-dep",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:route-injection-plugin",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:components-loader",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:tree-shake-composables:transform",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "post"
+    },
+    {
+      "name": "vite:build-import-analysis",
+      "start": 1701916800341,
+      "end": 1701916800341,
+      "order": "normal"
+    },
+    {
+      "name": "vite:reporter",
+      "start": 1701916800342,
+      "end": 1701916800342,
+      "order": "normal"
+    }
+  ]
+}

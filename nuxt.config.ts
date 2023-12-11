@@ -23,6 +23,11 @@ export default {
             name: 'template',
             component: resolve(__dirname, 'pages/template/'),
           },
+          {
+            path: '',
+            name: 'messageMain',
+            component: resolve(__dirname, 'pages/messageMain/'),
+          },
         ]
       );
     },

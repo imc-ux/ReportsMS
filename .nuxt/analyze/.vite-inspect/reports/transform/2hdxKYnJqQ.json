@@ -1,0 +1,223 @@
+{
+  "resolvedId": "E:/gitProject/ReportsMS/pages/template/index.vue?macro=true",
+  "transforms": [
+    {
+      "name": "vite:load-fallback",
+      "result": "<script lang=\"ts\" setup>\r\nimport { onMounted, onUnmounted, ref, reactive } from 'vue';\r\nimport { ElInput, ElText, ElSelect, ElOption } from 'element-plus';\r\nimport { Plus } from \"@element-plus/icons-vue\";\r\n\r\nconst title = ref<string>('')\r\nconst distinguish = ref<string>('区分')\r\nconst verticalColumn = ref<string>('')\r\nconst components = reactive<any[]>([{\r\n  value: 'input',\r\n  label: 'input',\r\n},\r\n{\r\n  value: 'batchInput',\r\n  label: 'batchInput',\r\n}])\r\nconst combinations = reactive<any[]>([\r\n  { value: '', key: Math.random() * 100, selected: ['input'] },\r\n  { value: '', key: Math.random() * 100, selected: ['input'] }\r\n])\r\n\r\n\r\n\r\nfunction onBtnBackClickHandler() {\r\n\r\n}\r\n\r\nfunction onBtnSaveClickHandler() {\r\n}\r\n\r\nasync function onBtnAddLineClickHandler() {\r\n  combinations.push({ value: '', key: Math.random() * 100, selected: ['input'] })\r\n}\r\n\r\nfunction onBtnPreviewClickHandler() {\r\n\r\n}\r\n\r\n</script>\r\n<template>\r\n  <client-only>\r\n    <div class=\"split-line\">\r\n      <Button class='btn-icon' @click=\"onBtnBackClickHandler\">返回</Button>\r\n      <Button class='btn-icon' @click=\"onBtnSaveClickHandler\">保存</Button>\r\n    </div>\r\n    <div class=\"main-flex\">\r\n      <div class=\"content-border\">\r\n        <div class=\"title\">\r\n          <div class=\"main-text\">\r\n            <el-text>标题</el-text>\r\n          </div>\r\n          <div class=\"main-input\">\r\n            <el-input v-model=\"title\" />\r\n          </div>\r\n        </div>\r\n        <div class=\"gauge-outfit\">\r\n          <div>\r\n            <div>\r\n              <div class=\"main-text\">\r\n                <el-text>表头</el-text>\r\n              </div>\r\n              <div class=\"main-input settled-input\">\r\n                <el-input v-model=\"distinguish\" disabled/>\r\n              </div>\r\n            </div>\r\n            <div v-for=\"combination in combinations\" :key=\"combination.key\" class=\"text-empty-margin changeable-input\">\r\n              <el-input v-model=\"combination.value\" />\r\n              <el-select class=\"main-select\" v-model=\"combination.selected\" multiple>\r\n                <el-option\r\n                  class=\"options\"\r\n                  v-for=\"item in components\"\r\n                  :key=\"item.value\"\r\n                  :label=\"item.label\"\r\n                  :value=\"item.value\"\r\n                />\r\n              </el-select>\r\n            </div>\r\n            <!-- <div class=\"text-empty-margin changeable-input\">\r\n              <el-input v-model=\"gaugeOutfit\" />\r\n              <el-select class=\"main-select\" v-model=\"selected2\" multiple>\r\n                <el-option\r\n                  v-for=\"item in components\"\r\n                  :key=\"item.value\"\r\n                  :label=\"item.label\"\r\n                  :value=\"item.value\"\r\n                />\r\n              </el-select>\r\n            </div> -->\r\n          </div>\r\n          <Button class='add-types-btn' :btnIcon=\"Plus\" @click=\"onBtnAddLineClickHandler\"></Button>\r\n        </div>\r\n        <div class=\"distinguish\">\r\n          <div>\r\n            <div>\r\n              <div class=\"main-text\">\r\n                <el-text>{{distinguish}}</el-text>\r\n              </div>\r\n              <div class=\"main-input\">\r\n                <el-input v-model=\"verticalColumn\"/>\r\n              </div>\r\n            </div>\r\n            <div class=\"main-input text-empty-margin\">\r\n              <el-input v-model=\"verticalColumn\" />\r\n            </div>\r\n            <div class=\"main-input text-empty-margin\">\r\n              <el-input v-model=\"verticalColumn\" />\r\n            </div>\r\n          </div>\r\n          <Button class='add-types-btn' :btnIcon=\"Plus\" @click=\"onBtnAddLineClickHandler\"></Button>\r\n        </div>\r\n      </div>\r\n      <div class='transform-btn-location'>\r\n        <Button class='btn-icon transform-btn' @click=\"onBtnPreviewClickHandler\">预览模板</Button>\r\n      </div>\r\n      <div class=\"preview-border\">\r\n        \r\n      </div>\r\n    </div>\r\n  </client-only>\r\n</template>\r\n\r\n<style>\r\n.main-flex {\r\n  display: flex;\r\n}\r\n\r\n.btn-icon > span > i{\r\n  height: 0px;\r\n  width: 0px;\r\n}\r\n\r\n.split-line {\r\n  border-bottom: 1px solid #cacaca;\r\n}\r\n\r\n.content-border {\r\n  height: 900px;\r\n  width: 40%;\r\n  border: 1px solid #cacaca;\r\n  border-radius: 0;\r\n  margin-top: 20px;\r\n  display: inline-block;\r\n}\r\n\r\n.title {\r\n  margin-bottom: 20px;\r\n}\r\n\r\n.main-text {\r\n  color: #000;\r\n  font-size: 16px;\r\n  font-weight: 600;\r\n  font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif, '微软雅黑';\r\n  margin: 10px;\r\n  width: 40px;\r\n  height: 30px;\r\n  line-height: 30px;\r\n  display: inline-block;\r\n}\r\n\r\n.main-input {\r\n  display: inline-block;\r\n  width: 85%;\r\n}\r\n\r\n.el-input {\r\n  --el-input-text-color: #000;\r\n  --el-input-border: #cacaca;\r\n  --el-input-hover-border: #08ADAA;\r\n  --el-input-focus-border: #08ADAA;\r\n  --el-input-transparent-border: 0 0 0 1px transparent inset;\r\n  --el-input-border-color: #cacaca;\r\n  --el-input-border-radius: 0;\r\n  --el-input-bg-color: #fff;\r\n  --el-input-icon-color: var(--el-text-color-placeholder);\r\n  --el-input-placeholder-color: var(--el-text-color-placeholder);\r\n  --el-input-hover-border-color: #08ADAA;\r\n  --el-input-clear-hover-color: var(--el-text-color-secondary);\r\n  --el-input-focus-border-color: #08ADAA;\r\n  --el-input-width: 100%;\r\n}\r\n\r\n.settled-input {\r\n  width: 50%;\r\n  margin-right: 20px;\r\n  display: inline-block;\r\n}\r\n\r\n.changeable-input {\r\n  width: 85%;\r\n  margin-right: 20px;\r\n  display: inline-block;\r\n}\r\n\r\n.settled-input-height {\r\n  height: 32px;\r\n}\r\n\r\n.text-empty-margin {\r\n  margin-left: 60px;\r\n  height: 32px;\r\n  display: flex;\r\n  margin-bottom: 10px;\r\n}\r\n\r\n.text-with-select {\r\n  margin-left: 60px;\r\n  height: 40px;\r\n}\r\n\r\n.main-select {\r\n  display: inline-block;\r\n  width: 65%;\r\n  margin-left: 20px;\r\n}\r\n\r\n.el-select {\r\n  --el-select-border-color-hover: #08ADAA;\r\n  --el-select-font-size: 14px;\r\n  --el-select-close-hover-color: #cacaca;\r\n  --el-select-input-color: #000;\r\n  --el-select-multiple-input-color: #000;\r\n  --el-select-input-focus-border-color: #08ADAA;\r\n  --el-select-input-font-size: 14px;\r\n}\r\n\r\n.add-types-btn {\r\n  width: 30px;\r\n  height: 30px;\r\n  margin-left: 60px;\r\n  margin-bottom: 10px;\r\n}\r\n\r\n.add-types-btn:hover {\r\n  width: 30px;\r\n  height: 30px;\r\n  margin-left: 60px;\r\n  margin-bottom: 10px;\r\n}\r\n\r\n.add-types-btn > span > i{\r\n  margin-left: 0px;\r\n}\r\n\r\n.gauge-outfit {\r\n  margin-bottom: 20px;\r\n}\r\n\r\n.transform-btn-location {\r\n  width: 20%;\r\n  margin: auto;\r\n}\r\n\r\n.transform-btn {\r\n  display: block;\r\n  margin: 0 auto;\r\n}\r\n\r\n.preview-border {\r\n  height: 900px;\r\n  width: 40%;\r\n  border: 1px solid #cacaca;\r\n  border-radius: 0;\r\n  margin-top: 20px;\r\n  display: inline-block;\r\n}\r\n\r\n.el-select-dropdown .el-select-dropdown__item.is-disabled.selected {\r\n  color:#08ADAA\r\n}\r\n\r\n.el-select-dropdown__empty {\r\n  padding:10px 0;\r\n  margin:0;\r\n  text-align:center;\r\n  color:var(--el-text-color-secondary);\r\n  font-size:var(--el-select-font-size)\r\n}\r\n\r\n.el-select-dropdown__wrap {\r\n  max-height:274px\r\n}\r\n\r\n.el-select-dropdown__list {\r\n  list-style:none;\r\n  padding:6px 0;\r\n  margin:0;\r\n  box-sizing:border-box\r\n}\r\n\r\n.el-select-dropdown__header {\r\n  padding:10px;\r\n  border-bottom:1px solid var(--el-border-color-light)\r\n}\r\n\r\n.el-select-dropdown__footer {\r\n  padding:10px;\r\n  border-top:1px solid var(--el-border-color-light)\r\n}\r\n\r\n.el-select {\r\n  --el-select-border-color-hover:#08ADAA;\r\n  --el-select-disabled-border:#cacaca;\r\n  --el-select-font-size:14px;\r\n  --el-select-close-hover-color:#cacaca;\r\n  --el-select-input-color:#000;\r\n  --el-select-multiple-input-color:#000;\r\n  --el-select-input-focus-border-color:#08ADAA;\r\n  --el-select-input-font-size:14px\r\n}\r\n\r\n.el-select {\r\n  display:inline-block;\r\n  position:relative;\r\n  vertical-align:middle;\r\n  line-height:32px\r\n}\r\n\r\n.el-select-dropdown__item.selected {\r\n  color: #08ADAA!important;\r\n}\r\n.el-select-dropdown__item.hover {\r\n  color: #08ADAA!important;\r\n}\r\n</style>\r\n",
+      "start": 1701916795603,
+      "end": 1701916796194,
+      "sourcemaps": null
+    },
+    {
+      "name": "nuxt:layer-aliasing",
+      "start": 1701916796194,
+      "end": 1701916796194,
+      "order": "pre"
+    },
+    {
+      "name": "nuxt:server-devonly:transform",
+      "start": 1701916796194,
+      "end": 1701916796195,
+      "order": "pre"
+    },
+    {
+      "name": "nuxt:client-fallback-auto-id",
+      "start": 1701916796195,
+      "end": 1701916796195,
+      "order": "pre"
+    },
+    {
+      "name": "vite:css",
+      "start": 1701916796195,
+      "end": 1701916796195,
+      "order": "normal"
+    },
+    {
+      "name": "vite:esbuild",
+      "start": 1701916796195,
+      "end": 1701916796195,
+      "order": "normal"
+    },
+    {
+      "name": "vite:json",
+      "start": 1701916796195,
+      "end": 1701916796195,
+      "order": "normal"
+    },
+    {
+      "name": "vite:worker",
+      "start": 1701916796195,
+      "end": 1701916796195,
+      "order": "normal"
+    },
+    {
+      "name": "vite:vue",
+      "result": "import _sfc_main from \"E:/gitProject/ReportsMS/pages/template/index.vue?vue&type=script&setup=true&lang.ts\";\nexport * from \"E:/gitProject/ReportsMS/pages/template/index.vue?vue&type=script&setup=true&lang.ts\";\nimport \"E:/gitProject/ReportsMS/pages/template/index.vue?vue&type=style&index=0&lang.css\";\nexport default _sfc_main;\n",
+      "start": 1701916796195,
+      "end": 1701916798991,
+      "order": "normal",
+      "sourcemaps": {
+        "mappings": ""
+      }
+    },
+    {
+      "name": "vite:vue-jsx",
+      "start": 1701916798992,
+      "end": 1701916798992,
+      "order": "normal"
+    },
+    {
+      "name": "replace",
+      "start": 1701916798992,
+      "end": 1701916798992,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:remove-plugin-metadata",
+      "start": 1701916798992,
+      "end": 1701916798992,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:chunk-error",
+      "start": 1701916798992,
+      "end": 1701916798992,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:components:imports",
+      "start": 1701916798992,
+      "end": 1701916798992,
+      "order": "normal"
+    },
+    {
+      "name": "replace",
+      "start": 1701916798992,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "ssr-styles",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:define",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:css-post",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:build-html",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:worker-import-meta-url",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:asset-import-meta-url",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "commonjs",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:dynamic-import-vars",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "vite:import-glob",
+      "start": 1701916798993,
+      "end": 1701916798993,
+      "order": "normal"
+    },
+    {
+      "name": "nuxt:composable-keys",
+      "start": 1701916798993,
+      "end": 1701916798994,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:imports-transform",
+      "start": 1701916798994,
+      "end": 1701916798995,
+      "order": "post"
+    },
+    {
+      "name": "unctx:transform",
+      "start": 1701916798995,
+      "end": 1701916798996,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:pages-macros-transform",
+      "result": "export { default } from \"E:/gitProject/ReportsMS/pages/template/index.vue?macro=true&vue&type=script&setup=true&lang.ts\"",
+      "start": 1701916798996,
+      "end": 1701916799000,
+      "order": "post",
+      "sourcemaps": {
+        "version": 3,
+        "sources": [
+          ""
+        ],
+        "names": [],
+        "mappings": "AAAA"
+      }
+    },
+    {
+      "name": "nuxt:runtime-paths-dep",
+      "start": 1701916799000,
+      "end": 1701916799000,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:route-injection-plugin",
+      "start": 1701916799000,
+      "end": 1701916799000,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:components-loader",
+      "start": 1701916799000,
+      "end": 1701916799001,
+      "order": "post"
+    },
+    {
+      "name": "nuxt:tree-shake-composables:transform",
+      "start": 1701916799001,
+      "end": 1701916799001,
+      "order": "post"
+    },
+    {
+      "name": "vite:build-import-analysis",
+      "start": 1701916799001,
+      "end": 1701916799001,
+      "order": "normal"
+    },
+    {
+      "name": "vite:reporter",
+      "start": 1701916799001,
+      "end": 1701916799001,
+      "order": "normal"
+    }
+  ]
+}
