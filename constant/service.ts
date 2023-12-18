@@ -1,3 +1,3 @@
-export enum Settings {
-    GetUserList = '/getUserList',
+export enum service {
+    GetUserList = 'getUserList',
 }
