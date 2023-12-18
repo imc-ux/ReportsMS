@@ -214,7 +214,7 @@ function onBtnPreviewClickHandler() {
 }
 
 .content-border {
-  height: 900px;
+  min-height: 900px;
   width: 40%;
   border: 1px solid #cacaca;
   border-radius: 0;
