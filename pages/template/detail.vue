@@ -3,12 +3,14 @@ import { onMounted, onUnmounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElSelect, ElOption } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
 import { TemplateInfo } from "../../vo";
+import { CommonAlert } from '../../constant/alert/base';
+import { ShowAlert } from '../../components/alert';
 
-const router = useRouter()
-const route = useRoute()
-const title = ref<string>('')
-const distinguish = ref<string>('区分')
-const verticalColumn = ref<string>('')
+const router = useRouter();
+const route = useRoute();
+const title = ref<string>('');
+const distinguish = ref<string>('区分');
+const verticalColumn = ref<string>('');
 const components = reactive<any[]>([{
   value: 'input',
   label: 'input',
@@ -16,50 +18,98 @@ const components = reactive<any[]>([{
 {
   value: 'batchInput',
   label: 'batchInput',
-}])
+}]);
 const combinations = reactive<any[]>([
-  { value: '', key: 0, selected: ['input'] },
-  { value: '', key: 1, selected: ['input'] }
-])
+  { value: '', type: ['input'] },
+  { value: '', type: ['input'] }
+]);
 const inputLines = reactive<any[]>([
-  { value: '', key: 0 },
-  { value: '', key: 1 }
-])
+  { value: '', type: ['input'] },
+  { value: '', type: ['input'] }
+]);
 
 onMounted(() => {
-  const com = route.query
-  console.log(com)
+  if (JSON.stringify(route.query) === '{}') {
+    return;
+  } else {
+    initTemplate();
+  }
 })
 
+function initTemplate() {
+  title.value = route.query.name;
+  const tempTitleArr = JSON.parse(route.query.title)
+  const tempElementArr = JSON.parse(route.query.element)
+  tempTitleArr.forEach((data: any) => {
+    data.type = data.type.split(',')
+  })
+  combinations.splice(0, 2, ...tempTitleArr);
+  tempElementArr.forEach((data: any) => {
+    data.type = data.type.split(',');
+  })
+  verticalColumn.value = tempElementArr.shift().value;
+  inputLines.splice(0, 2, ...tempElementArr);
+}
+
 function onBtnBackClickHandler() {
-  router.push({ path: '/template', query: inputLines })
+  router.push({ path: '/template' });
 }
 
 function onBtnSaveClickHandler() {
+  checkContent();
   const info: TemplateInfo = {};
-  const contentArr: any[] = combinations.map(item => item.value)
-  const elementArr: any[] = inputLines.map(item => item.value)
   info.name = title.value;
-  info.content = String(contentArr);
-  info.element = String([verticalColumn.value, ...elementArr]);
+  info.title = transform(combinations);
+  info.element = transform([{ value: verticalColumn.value, type: ['input']}, ...inputLines]);
   info.creator = 'kangjiaqi';
-  console.log(info)
+  console.log(info);
+}
+
+function transform(arr: any[]) {
+  const tempArr: any[] = JSON.parse(JSON.stringify(arr));
+  tempArr.forEach(data => {
+    data.type = String(data.type)
+  })
+  return JSON.stringify(tempArr);
+}
+
+function checkContent() {
+  if (!title.value) {
+    ShowAlert(CommonAlert.TITLE_EMPTY, 1)
+    return;
+  }
+  for (let i = 0; i < combinations?.length; i++) {
+    if (!combinations[i].value) {
+      ShowAlert(CommonAlert.HEADER_EMPTY, 1);
+      return;
+    }
+    if (combinations[i].type.length === 0) {
+      ShowAlert(CommonAlert.HEADER_COMPONENT_EMPTY, 1);
+      return;
+    }
+  }
+  const tempArr = [{ value: verticalColumn.value, type: ['input'] }, ...inputLines]
+  for (let i = 0; i < tempArr?.length; i++) {
+    if (!tempArr[i].value) {
+      ShowAlert(CommonAlert.DISTINGUISH_EMPTY, 1);
+      return;
+    }
+  }
 }
 
 function onBtnAddLineClickHandler(type: string) {
-  if (type === 'combination') {
-    combinations.push({ value: '', selected: ['input'] })
-    console.log(combinations)
+  if (type === 'combination') {;
+    combinations.push({ value: '', type: ['input'] });
   } else if (type === 'inputLine'){ 
-    inputLines.push({ value: '' })
+    inputLines.push({ value: '', type: ['input'] });
   }
 }
 
 function onBtnDeleteLineClickHandler(type: string, index: number) {
   if (type === 'combination') {
-    combinations.splice(index, 1)
+    combinations.splice(index, 1);
   } else if (type === 'inputLine') {
-    inputLines.splice(index, 1)
+    inputLines.splice(index, 1);
   }
 }
 
@@ -97,7 +147,7 @@ function onBtnPreviewClickHandler() {
             </div>
             <div v-for="(combination, index) in combinations" :key="index" class="text-empty-margin changeable-input">
               <el-input v-model="combination.value" />
-              <el-select class="main-select" v-model="combination.selected" multiple>
+              <el-select class="main-select" v-model="combination.type" multiple>
                 <el-option
                   class="options"
                   v-for="item in components"

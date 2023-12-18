@@ -3,9 +3,11 @@ import { onMounted, onUnmounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { Search } from "@element-plus/icons-vue";
 import { TemplateInfo } from "../../vo";
+import { CommonAlert } from '../../constant/alert/base';
+import { ShowAlert } from '../../components/alert';
 
-const router = useRouter()
-const title = ref<string>('')
+const router = useRouter();
+const title = ref<string>('');
 const templateData = reactive<any[]>([{
   key: 1,
   title: '日报模板',
@@ -17,25 +19,24 @@ const templateData = reactive<any[]>([{
   title: '周报模板',
   creator: '康家旗',
   creatTime: '2023-12-07',
-}])
-
+}]);
 
 function onBtnSearchClickHandler() {
-
+  // title.value
 }
 
 function onBtnAddClickHandler() {
-  router.push({path: '/templateDetail', query: { value: '', key: 0, selected: ['input'] } })
+  router.push({path: '/template/detail'})
 }
 
 function onBtnEditClickHandler(index: number, row: any) {
-  console.log(index)
-  console.log(row)
-  // router.push({ path: '/templateDetail', query: { value: '', key: 0, selected: ['input'] } })
+  const json = "[{\"value\":\"1\",\"type\":\"input\"},{\"value\":\"2\",\"type\":\"input\"},{\"value\":\"3\",\"type\":\"input\"}]"
+  const jsons = "[{\"value\":\"1\",\"type\":\"input\"},{\"value\":\"2\",\"type\":\"input\"},{\"value\":\"3\",\"type\":\"input\"},{\"value\":\"4\",\"type\":\"input\"}]"
+  router.push({ path: '/template/detail', query: { name: '日报模板', title: json, element: jsons } })
 }
 
 function onBtnDeleteClickHandler() {
-
+  ShowAlert(CommonAlert.DELETE_DATA, 0)
 }
 
 </script>

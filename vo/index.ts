@@ -2,7 +2,7 @@ export interface TemplateInfo {
   sRequestNo?: string;
   nid?: number; // 自增键值
   name?: string; // 题目
-  content?: string; // 表头，多个逗号分割字符串
+  title?: string; // 表头，多个逗号分割字符串
   element?: string; // 区分，多个逗号分割字符串
   creator?: string; // 创建者id
   creatorName?: string; // 创建者姓名
