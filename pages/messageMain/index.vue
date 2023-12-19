@@ -3,6 +3,7 @@ import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableCo
 import { ref, reactive, onMounted } from 'vue';
 import { useState } from 'nuxt/app';
 import { getUserList } from '~/api/messageApi';
+import { json } from 'stream/consumers';
 
 const clearable = ref<boolean>(true);
 const dateValue = useState<any>('dateValue', () => '');
@@ -19,14 +20,7 @@ const modelTypes = reactive<any[]>([{
     label: '周报模板',
 }])
 
-const userNames = reactive<any[]>([{
-    value: 'a',
-    label: '毛欣',
-},
-{
-    value: 'b',
-    label: '刘津海',
-}])
+const userNames = useState<any[]>('userNames', () => []);
 
 const userList = async () => {
     try {
@@ -35,12 +29,17 @@ const userList = async () => {
         info.usertype = "U";
         info.iStart = 0;
         info.iPageCount = 20;
-        let res: any = await getUserList(info);
-        //console.log(res.data.value);
+        const res: any = await getUserList(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            userNames.value = result.data;
+        }
     } catch (error) {
-        //console.log(error);
+
     }
 };
+
+
 
 
 onMounted(() => {
@@ -93,7 +92,7 @@ function onNewMessageHandler() {
                     </div>
                     <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
                         <el-select v-model="selectedUser" placeholder="请选择" :clearable="clearable">
-                            <el-option v-for="item in userNames" :key="item.value" :label="item.label" :value="item.value">
+                            <el-option v-for="item in userNames" :key="item.id" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
                     </div>
