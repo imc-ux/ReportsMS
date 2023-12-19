@@ -45,6 +45,10 @@ export default {
       );
     },
   },
-  css: ["element-plus/dist/index.css"],
+  css: [
+    "element-plus/dist/index.css",
+    "~/assets/css/main.css",
+    "~/assets/css/element.css",
+  ],
   ssr: false,
 };

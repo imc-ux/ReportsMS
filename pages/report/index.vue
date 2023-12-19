@@ -2,9 +2,9 @@
 import { onMounted, onUnmounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
-import { TemplateInfo } from "../../vo";
-import { CommonAlert } from '../../constant/alert/base';
-import { ShowAlert } from '../../components/alert';
+import { TemplateInfo } from "~/vo";
+import { CommonAlert } from '~/constant/alert/base';
+import { ShowAlert } from '~/components/alert';
 import type { TabsPaneContext } from 'element-plus'
 
 const reportName  = ref<string>('');
@@ -16,7 +16,7 @@ const headersArr = reactive<any[]>([]);
 
 
 
-const TemplateList = [{
+const TemplateList = [{  //这种写死的都是模拟数据 测ui的时候用一下 不是正式代码 之后删除
   nid: 1,
   name: '日报模板',
   title: "[{\"value\":\"项目\",\"type\":\"input\"},{\"value\":\"进行情况\",\"type\":\"input\"}]",
@@ -35,18 +35,17 @@ const TemplateList = [{
 onMounted(() => {
   reportName.value = TemplateList[0].name;
   refreshTemplate(TemplateList[0]);
-  console.log(elementsArr)
 })
 
 function onBtnSendClickHandler() {
   
 }
 
-function onBtnAddLineClickHandler(arr: any[]) {
+function onBtnAddLineClickHandler(arr: TemplateInfo[]) {
   arr.push(JSON.parse(JSON.stringify(headersArr)));
 }
 
-function onBtnDeleteLineClickHandler(arr: any[], index: number) {
+function onBtnDeleteLineClickHandler(arr: TemplateInfo[], index: number) {
   arr.splice(index, 1);
 }
 
@@ -97,7 +96,7 @@ function onBtnPreviewClickHandler() {
       <div class="content-border">
         <div v-for="(part, index) in elementsArr" :key="index" >
           <div>
-            <div class="main-text">
+            <div class="reoprt-element-text">
               <el-text>{{ part.value }}</el-text>
             </div>
           </div>
@@ -111,7 +110,7 @@ function onBtnPreviewClickHandler() {
               </div>
               <div class="content-format-com box-top-right">
                 <el-input v-model="unit.inputValue" />
-                <el-select class="main-select" v-model="unit.selectedType">
+                <el-select class="component-select" v-model="unit.selectedType">
                   <el-option
                     class="options"
                     v-for="item in unit.type"
@@ -139,10 +138,6 @@ function onBtnPreviewClickHandler() {
 </template>
 
 <style>
-.main-flex {
-  display: flex;
-}
-
 .header {
   display: flex;
   height: 20px;
@@ -159,11 +154,6 @@ function onBtnPreviewClickHandler() {
   right: 0;
 }
 
-.btn-icon > span > i{
-  height: 0px;
-  width: 0px;
-}
-
 .section-border {
   border: 1px solid #cacaca;
   margin: 0 5px 3px;
@@ -175,7 +165,6 @@ function onBtnPreviewClickHandler() {
 }
 
 .content-format-com {
-  /* display: inline-block; */
   display: flex;
   line-height: 28px;
 }
@@ -222,45 +211,6 @@ function onBtnPreviewClickHandler() {
   display: inline-block;
 }
 
-.main-text {
-  color: #000;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif, '微软雅黑';
-  margin: 10px;
-  width: 100%;
-  height: 30px;
-  line-height: 30px;
-  display: inline-block;
-}
-
-.el-input {
-  --el-input-text-color: #000;
-  --el-input-border: #cacaca;
-  --el-input-hover-border: #08ADAA;
-  --el-input-focus-border: #08ADAA;
-  --el-input-transparent-border: 0 0 0 1px transparent inset;
-  --el-input-border-color: #cacaca;
-  --el-input-border-radius: 0;
-  --el-input-bg-color: #fff;
-  --el-input-icon-color: var(--el-text-color-placeholder);
-  --el-input-placeholder-color: var(--el-text-color-placeholder);
-  --el-input-hover-border-color: #08ADAA;
-  --el-input-clear-hover-color: var(--el-text-color-secondary);
-  --el-input-focus-border-color: #08ADAA;
-  --el-input-width: 100%;
-}
-
-.el-select {
-  --el-select-border-color-hover: #08ADAA;
-  --el-select-font-size: 14px;
-  --el-select-close-hover-color: #cacaca;
-  --el-select-input-color: #000;
-  --el-select-multiple-input-color: #000;
-  --el-select-input-focus-border-color: #08ADAA;
-  --el-select-input-font-size: 14px;
-}
-
 .add-types-btn {
   width: 30px;
   height: 30px;
@@ -298,63 +248,17 @@ function onBtnPreviewClickHandler() {
   display: inline-block;
 }
 
-.el-select-dropdown .el-select-dropdown__item.is-disabled.selected {
-  color:#08ADAA
-}
-
-.el-select-dropdown__empty {
-  padding:10px 0;
-  margin:0;
-  text-align:center;
-  color:var(--el-text-color-secondary);
-  font-size:var(--el-select-font-size)
-}
-
-.el-select-dropdown__wrap {
-  max-height:274px
-}
-
-.el-select-dropdown__list {
-  list-style:none;
-  padding:6px 0;
-  margin:0;
-  box-sizing:border-box
-}
-
-.el-select-dropdown__header {
-  padding:10px;
-  border-bottom:1px solid var(--el-border-color-light)
-}
-
-.el-select-dropdown__footer {
-  padding:10px;
-  border-top:1px solid var(--el-border-color-light)
-}
-
-.el-select {
-  --el-select-border-color-hover:#08ADAA;
-  --el-select-disabled-border:#cacaca;
-  --el-select-font-size:14px;
-  --el-select-close-hover-color:#cacaca;
-  --el-select-input-color:#000;
-  --el-select-multiple-input-color:#000;
-  --el-select-input-focus-border-color:#08ADAA;
-  --el-select-input-font-size:14px
-}
-
-.el-select {
-  display:inline-block;
-  position:relative;
-  vertical-align:middle;
-  line-height:32px
-}
-
-.el-select-dropdown__item.selected {
-  color: #08ADAA!important;
-}
-
-.el-select-dropdown__item.hover {
-  color: #08ADAA!important;
+.reoprt-element-text {
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
+    "微软雅黑";
+  margin: 10px;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  display: inline-block;
 }
 
 .delete-btn {
@@ -381,37 +285,7 @@ function onBtnPreviewClickHandler() {
   width: 40px;
 }
 
-.el-tabs--card>.el-tabs__header .el-tabs__nav {
-  border-left: 1px solid #cacaca;
-  border-top: 1px solid #cacaca;
-  border-right: 1px solid #cacaca;
-  border-radius: 0;
-  box-sizing: border-box;
-}
-
-.el-tabs--card>.el-tabs__header {
-  border-bottom: 0px;
-  height: var(--el-tabs-header-height);
-}
-
-.el-tabs__item:hover {
-  color: #000;
-  cursor: pointer;
-}
-
-.el-tabs--card>.el-tabs__header .el-tabs__item.is-active {
-    border-bottom: 0px;
-    color: #fff;
-    background-color: #08ADAA;
-}
-
-.el-tabs__header {
-  padding: 0;
-  position: relative;
-  margin: 0;
-}
-
-.main-select {
+.component-select {
   display: inline-block;
   width: 120px;
   margin-left: 3px;

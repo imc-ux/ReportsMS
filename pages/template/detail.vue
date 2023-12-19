@@ -2,16 +2,18 @@
 import { onMounted, onUnmounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElSelect, ElOption } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
-import { TemplateInfo } from "../../vo";
-import { CommonAlert } from '../../constant/alert/base';
-import { ShowAlert } from '../../components/alert';
+import { TemplateInfo, ComponentlistInfo, SetContentInfo } from "~/vo";
+import { CommonAlert } from '~/constant/alert/base';
+import { ShowAlert } from '~/components/alert';
+import { createTemplate, updateTemplate} from '~/api/templateApi';
+import { getUserList } from '~/api/messageApi';
 
 const router = useRouter();
 const route = useRoute();
 const title = ref<string>('');
 const distinguish = ref<string>('区分');
 const verticalColumn = ref<string>('');
-const components = reactive<any[]>([{
+const components = reactive<ComponentlistInfo[]>([{
   value: 'input',
   label: 'input',
 },
@@ -19,16 +21,44 @@ const components = reactive<any[]>([{
   value: 'batchInput',
   label: 'batchInput',
 }]);
-const combinations = reactive<any[]>([
+const combinations = reactive<SetContentInfo[]>([
   { value: '', type: ['input'] },
   { value: '', type: ['input'] }
 ]);
-const inputLines = reactive<any[]>([
+const inputLines = reactive<SetContentInfo[]>([
   { value: '', type: ['input'] },
   { value: '', type: ['input'] }
 ]);
 
+const userList = async () => {
+  try {
+    const info: any = {};
+    info.blockflag = "N";
+    info.usertype = "U";
+    info.iStart = 0;
+    info.iPageCount = 20;
+    await getUserList(info);
+  } catch (error) {
+    //console.log(error);
+  }
+};
+
+const saveTemplate = async () => {
+  try {
+    const info: TemplateInfo = {};
+    info.name = title.value;
+    info.title = transform(combinations);
+    info.element = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
+    info.creator = 'kangjiaqi';
+    let res: any = await createTemplate(info);
+    console.log(res.data.value);
+  } catch (error) {
+    //console.log(error);
+  }
+};
+
 onMounted(() => {
+  // userList();
   if (JSON.stringify(route.query) === '{}') {
     return;
   } else {
@@ -57,15 +87,15 @@ function onBtnBackClickHandler() {
 
 function onBtnSaveClickHandler() {
   checkContent();
-  const info: TemplateInfo = {};
-  info.name = title.value;
-  info.title = transform(combinations);
-  info.element = transform([{ value: verticalColumn.value, type: ['input']}, ...inputLines]);
-  info.creator = 'kangjiaqi';
-  console.log(info);
+  saveTemplate();
+  // const info: TemplateInfo = {};
+  // info.name = title.value;
+  // info.title = transform(combinations);
+  // info.element = transform([{ value: verticalColumn.value, type: ['input']}, ...inputLines]);
+  // info.creator = 'kangjiaqi';
 }
 
-function transform(arr: any[]) {
+function transform(arr: SetContentInfo[]) {
   const tempArr: any[] = JSON.parse(JSON.stringify(arr));
   tempArr.forEach(data => {
     data.type = String(data.type)
@@ -128,7 +158,7 @@ function onBtnPreviewClickHandler() {
     <div class="main-flex">
       <div class="content-border">
         <div class="title">
-          <div class="main-text">
+          <div class="title-text">
             <el-text>标题</el-text>
           </div>
           <div class="main-input">
@@ -138,7 +168,7 @@ function onBtnPreviewClickHandler() {
         <div class="gauge-outfit">
           <div>
             <div>
-              <div class="main-text">
+              <div class="title-text">
                 <el-text>表头</el-text>
               </div>
               <div class="main-input settled-input">
@@ -147,7 +177,7 @@ function onBtnPreviewClickHandler() {
             </div>
             <div v-for="(combination, index) in combinations" :key="index" class="text-empty-margin changeable-input">
               <el-input v-model="combination.value" />
-              <el-select class="main-select" v-model="combination.type" multiple>
+              <el-select class="component-multiple-select" v-model="combination.type" multiple>
                 <el-option
                   class="options"
                   v-for="item in components"
@@ -165,7 +195,7 @@ function onBtnPreviewClickHandler() {
         <div class="distinguish">
           <div>
             <div>
-              <div class="main-text">
+              <div class="title-text">
                 <el-text>{{distinguish}}</el-text>
               </div>
               <div class="main-input">
@@ -191,15 +221,6 @@ function onBtnPreviewClickHandler() {
 </template>
 
 <style>
-.main-flex {
-  display: flex;
-}
-
-.btn-icon > span > i{
-  height: 0px;
-  width: 0px;
-}
-
 .split-line {
   border-bottom: 1px solid #cacaca;
 }
@@ -221,38 +242,9 @@ function onBtnPreviewClickHandler() {
   margin-bottom: 20px;
 }
 
-.main-text {
-  color: #000;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif, '微软雅黑';
-  margin: 10px;
-  width: 40px;
-  height: 30px;
-  line-height: 30px;
-  display: inline-block;
-}
-
 .main-input {
   display: inline-block;
   width: 85%;
-}
-
-.el-input {
-  --el-input-text-color: #000;
-  --el-input-border: #cacaca;
-  --el-input-hover-border: #08ADAA;
-  --el-input-focus-border: #08ADAA;
-  --el-input-transparent-border: 0 0 0 1px transparent inset;
-  --el-input-border-color: #cacaca;
-  --el-input-border-radius: 0;
-  --el-input-bg-color: #fff;
-  --el-input-icon-color: var(--el-text-color-placeholder);
-  --el-input-placeholder-color: var(--el-text-color-placeholder);
-  --el-input-hover-border-color: #08ADAA;
-  --el-input-clear-hover-color: var(--el-text-color-secondary);
-  --el-input-focus-border-color: #08ADAA;
-  --el-input-width: 100%;
 }
 
 .settled-input {
@@ -283,21 +275,24 @@ function onBtnPreviewClickHandler() {
   height: 40px;
 }
 
-.main-select {
+.component-multiple-select {
   display: inline-block;
   width: 65%;
   margin-left: 20px;
   min-width: 220px;
 }
 
-.el-select {
-  --el-select-border-color-hover: #08ADAA;
-  --el-select-font-size: 14px;
-  --el-select-close-hover-color: #cacaca;
-  --el-select-input-color: #000;
-  --el-select-multiple-input-color: #000;
-  --el-select-input-focus-border-color: #08ADAA;
-  --el-select-input-font-size: 14px;
+.title-text {
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
+    "微软雅黑";
+  margin: 10px;
+  width: 40px;
+  height: 30px;
+  line-height: 30px;
+  display: inline-block;
 }
 
 .add-types-btn {
@@ -339,65 +334,6 @@ function onBtnPreviewClickHandler() {
   border-radius: 0;
   margin-top: 20px;
   display: inline-block;
-}
-
-.el-select-dropdown .el-select-dropdown__item.is-disabled.selected {
-  color:#08ADAA
-}
-
-.el-select-dropdown__empty {
-  padding:10px 0;
-  margin:0;
-  text-align:center;
-  color:var(--el-text-color-secondary);
-  font-size:var(--el-select-font-size)
-}
-
-.el-select-dropdown__wrap {
-  max-height:274px
-}
-
-.el-select-dropdown__list {
-  list-style:none;
-  padding:6px 0;
-  margin:0;
-  box-sizing:border-box
-}
-
-.el-select-dropdown__header {
-  padding:10px;
-  border-bottom:1px solid var(--el-border-color-light)
-}
-
-.el-select-dropdown__footer {
-  padding:10px;
-  border-top:1px solid var(--el-border-color-light)
-}
-
-.el-select {
-  --el-select-border-color-hover:#08ADAA;
-  --el-select-disabled-border:#cacaca;
-  --el-select-font-size:14px;
-  --el-select-close-hover-color:#cacaca;
-  --el-select-input-color:#000;
-  --el-select-multiple-input-color:#000;
-  --el-select-input-focus-border-color:#08ADAA;
-  --el-select-input-font-size:14px
-}
-
-.el-select {
-  display:inline-block;
-  position:relative;
-  vertical-align:middle;
-  line-height:32px
-}
-
-.el-select-dropdown__item.selected {
-  color: #08ADAA!important;
-}
-
-.el-select-dropdown__item.hover {
-  color: #08ADAA!important;
 }
 
 .delete-btn {

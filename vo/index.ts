@@ -1,5 +1,4 @@
 export interface TemplateInfo {
-  sRequestNo?: string;
   nid?: number; // 自增键值
   name?: string; // 题目
   title?: string; // 表头，多个逗号分割字符串
@@ -10,4 +9,14 @@ export interface TemplateInfo {
   deleteTime?: string; // 删除时间
   isDelete?: string; // 是否删除
   totalCount?: string; // 总条数
+}
+
+export interface ComponentlistInfo {
+  value: string;
+  label: string;
+}
+
+export interface SetContentInfo {
+  value: string;
+  type: string[];
 }
