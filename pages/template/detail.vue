@@ -13,6 +13,7 @@ const route = useRoute();
 const title = ref<string>('');
 const distinguish = ref<string>('区分');
 const verticalColumn = ref<string>('');
+const editType = ref<boolean>(false);
 const components = reactive<ComponentlistInfo[]>([{
   value: 'input',
   label: 'input',
@@ -43,15 +44,37 @@ const userList = async () => {
   }
 };
 
-const saveTemplate = async () => {
+const createSaveTemplate = async () => {
   try {
     const info: TemplateInfo = {};
     info.name = title.value;
     info.title = transform(combinations);
     info.element = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
     info.creator = 'kangjiaqi';
-    let res: any = await createTemplate(info);
-    console.log(res.data.value);
+    const res: any = await createTemplate(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => onBtnBackClickHandler())
+    }
+  } catch (error) {
+    //console.log(error);
+  }
+};
+
+const editSaveTemplate = async () => {
+  try {
+    const info: TemplateInfo = {};
+    info.nid = Number(route.query?.nid);
+    info.name = title.value;
+    info.title = transform(combinations);
+    info.element = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
+    info.changer = 'kangjiaqi';
+    console.log(info)
+    const res: any = await updateTemplate(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => onBtnBackClickHandler())
+    }
   } catch (error) {
     //console.log(error);
   }
@@ -59,9 +82,10 @@ const saveTemplate = async () => {
 
 onMounted(() => {
   // userList();
-  if (JSON.stringify(route.query) === '{}') {
+  if (JSON.stringify(route?.query) === '{}') {
     return;
   } else {
+    editType.value = true;
     initTemplate();
   }
 })
@@ -86,24 +110,6 @@ function onBtnBackClickHandler() {
 }
 
 function onBtnSaveClickHandler() {
-  checkContent();
-  saveTemplate();
-  // const info: TemplateInfo = {};
-  // info.name = title.value;
-  // info.title = transform(combinations);
-  // info.element = transform([{ value: verticalColumn.value, type: ['input']}, ...inputLines]);
-  // info.creator = 'kangjiaqi';
-}
-
-function transform(arr: SetContentInfo[]) {
-  const tempArr: any[] = JSON.parse(JSON.stringify(arr));
-  tempArr.forEach(data => {
-    data.type = String(data.type)
-  })
-  return JSON.stringify(tempArr);
-}
-
-function checkContent() {
   if (!title.value) {
     ShowAlert(CommonAlert.TITLE_EMPTY, 1)
     return;
@@ -125,6 +131,19 @@ function checkContent() {
       return;
     }
   }
+  if (editType.value) {
+    editSaveTemplate();
+  } else {
+    createSaveTemplate();
+  }
+}
+
+function transform(arr: SetContentInfo[]) {
+  const tempArr: any[] = JSON.parse(JSON.stringify(arr));
+  tempArr.forEach(data => {
+    data.type = String(data.type)
+  })
+  return JSON.stringify(tempArr);
 }
 
 function onBtnAddLineClickHandler(type: string) {
@@ -280,19 +299,6 @@ function onBtnPreviewClickHandler() {
   width: 65%;
   margin-left: 20px;
   min-width: 220px;
-}
-
-.title-text {
-  color: #000;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
-    "微软雅黑";
-  margin: 10px;
-  width: 40px;
-  height: 30px;
-  line-height: 30px;
-  display: inline-block;
 }
 
 .add-types-btn {

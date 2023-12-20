@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 <template>
   <el-button class="btn" :disabled="props.disabled">
     <slot />
-    <el-icon v-if="props.showIcon" class="el-icon--right">
+    <el-icon v-if="props.showIcon && props.btnIcon" class="el-icon--right">
       <props.btnIcon /> 
     </el-icon>
   </el-button>

@@ -143,3 +143,39 @@
   position: relative;
   margin: 0;
 }
+
+.el-textarea__inner {
+  position: relative;
+  display: block;
+  resize: vertical;
+  padding: 5px 11px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  width: 100%;
+  font-size: inherit;
+  font-family: inherit;
+  color: #000;
+  background-color: var(--el-input-bg-color, var(--el-fill-color-blank));
+  background-image: none;
+  box-shadow: 0;
+  border-radius: 0;
+  transition: var(--el-transition-box-shadow);
+  border: none;
+}
+
+.el-textarea {
+  --el-input-text-color: var(--el-text-color-regular);
+  --el-input-border: var(--el-border);
+  --el-input-hover-border: var(--el-border-color-hover);
+  --el-input-focus-border: #08adaa;
+  --el-input-transparent-border: 0 0 0 1px transparent inset;
+  --el-input-border-color: var(--el-border-color);
+  --el-input-border-radius: var(--el-border-radius-base);
+  --el-input-bg-color: var(--el-fill-color-blank);
+  --el-input-icon-color: var(--el-text-color-placeholder);
+  --el-input-placeholder-color: var(--el-text-color-placeholder);
+  --el-input-hover-border-color: #08adaa;
+  --el-input-clear-hover-color: var(--el-text-color-secondary);
+  --el-input-focus-border-color: #08adaa;
+  --el-input-width: 100%;
+}

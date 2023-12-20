@@ -58,7 +58,7 @@ export default {
         <template #footer>
             <span class="dialog-footer">
                 <Button class="alert-button" :showIcon="false" @click="onBtnCloseHandler()">确定</Button>
-            </span>
+            </span>  
         </template>
     </el-dialog>
 </template>

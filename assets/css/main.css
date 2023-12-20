@@ -7,3 +7,16 @@
   height: 0px;
   width: 0px;
 }
+
+.title-text {
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
+    "微软雅黑";
+  margin: 10px;
+  width: 40px;
+  height: 30px;
+  line-height: 30px;
+  display: inline-block;
+}

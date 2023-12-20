@@ -6,34 +6,30 @@ import { TemplateInfo } from "~/vo";
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
 import type { TabsPaneContext } from 'element-plus'
+import { getTemplateList } from '~/api/templateApi';
 
 const reportName  = ref<string>('');
 const elementsArr = reactive<any[]>([]);
 const headersArr = reactive<any[]>([]);
+const TemplateList = reactive<TemplateInfo[]>([]);
 
-
-
-
-
-
-const TemplateList = [{  //这种写死的都是模拟数据 测ui的时候用一下 不是正式代码 之后删除
-  nid: 1,
-  name: '日报模板',
-  title: "[{\"value\":\"项目\",\"type\":\"input\"},{\"value\":\"进行情况\",\"type\":\"input\"}]",
-  element: "[{\"value\":\"昨日实际\",\"type\":\"input\"},{\"value\":\"今日计划\",\"type\":\"input\"},{\"value\":\"待办事项\",\"type\":\"input\"}]",
-  creator: 'kangjiaqi',
-  creatorName: '康家旗',
-  }, {
-  nid: 2,
-  name: '周报模板',
-  title: "[{\"value\":\"项目\",\"type\":\"input\"},{\"value\":\"进行情况\",\"type\":\"input\"},{\"value\":\"总进度\",\"type\":\"input\"}]",
-  element: "[{\"value\":\"上周计划\",\"type\":\"input\"},{\"value\":\"本周计划\",\"type\":\"input\"},{\"value\":\"下周计划\",\"type\":\"input\"},{\"value\":\"BUGS\",\"type\":\"input\"}]",
-  creator: 'kangjiaqi',
-  creatorName: '康家旗',
-}]
+const getTempList = async () => {
+  try {
+    const info: TemplateInfo = {};
+    info.name = '';
+    const res: any = await getTemplateList(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      TemplateList.push(...result.data);
+    }
+  } catch (error) {
+    //console.log(error);
+  }
+};
 
 onMounted(() => {
-  reportName.value = TemplateList[0].name;
+  getTempList();
+  reportName.value = TemplateList[0].name as string;
   refreshTemplate(TemplateList[0]);
 })
 
@@ -41,11 +37,11 @@ function onBtnSendClickHandler() {
   
 }
 
-function onBtnAddLineClickHandler(arr: TemplateInfo[]) {
+function onBtnAddLineClickHandler(arr: any[]) {
   arr.push(JSON.parse(JSON.stringify(headersArr)));
 }
 
-function onBtnDeleteLineClickHandler(arr: TemplateInfo[], index: number) {
+function onBtnDeleteLineClickHandler(arr: any[], index: number) {
   arr.splice(index, 1);
 }
 
@@ -109,8 +105,14 @@ function onBtnPreviewClickHandler() {
                 <el-text class="left_text">{{ `${unit.value}${index + 1}` }}</el-text>
               </div>
               <div class="content-format-com box-top-right">
-                <el-input v-model="unit.inputValue" />
-                <el-select class="component-select" v-model="unit.selectedType">
+                <el-input v-if="unit.selectedType === 'input'" v-model="unit.inputValue" />
+                <el-input
+                  v-if="unit.selectedType === 'batchInput'"
+                  v-model="unit.inputValue"
+                  :autosize="{ minRows: 2 }"
+                  type="textarea"
+                />
+                <el-select class="component-select" v-model="unit.selectedType" :disabled="unit.type.length === 1">
                   <el-option
                     class="options"
                     v-for="item in unit.type"
