@@ -21,9 +21,9 @@ const templateData = reactive<any[]>([{  //这种写死的都是模拟数据 测
   title: '周报模板',
   creator: '康家旗',
   creatTime: '2023-12-07',
-  }]);
+}]);
 
-  const getTempList = async () => {
+const getTempList = async () => {
   try {
     const info: TemplateInfo = {};
     info.name = title.value;
@@ -40,7 +40,7 @@ function onBtnSearchClickHandler() {
 }
 
 function onBtnAddClickHandler() {
-  router.push({path: '/template/detail'})
+  router.push({ path: '/template/detail' })
 }
 
 function onBtnEditClickHandler(index: number, row: any) {
@@ -73,16 +73,16 @@ function onBtnDeleteClickHandler() {
     </div>
     <div>
       <el-table :data="templateData" style="width: 100%" border>
-      <el-table-column header-align="center" align="center" prop="key" label="序号" min-width="50" />
-      <el-table-column header-align="center" align="center" prop="title" label="模板标题" min-width="200" />
-      <el-table-column header-align="center" align="center" prop="creator" label="创建者" min-width="100" />
-      <el-table-column header-align="center" align="center" prop="creatTime" label="创建时间" min-width="120" />
-      <el-table-column header-align="center" align="center" label="操作" min-width="120">
-        <template #default="scope">
-          <el-button link type="primary" @click="onBtnEditClickHandler(scope.$index, scope.row)">编辑</el-button>
-          <el-button link type="primary" @click="onBtnDeleteClickHandler" >删除</el-button>
-        </template>
-      </el-table-column>
+        <el-table-column header-align="center" align="center" prop="key" label="序号" min-width="50" />
+        <el-table-column header-align="center" align="center" prop="title" label="模板标题" min-width="200" />
+        <el-table-column header-align="center" align="center" prop="creator" label="创建者" min-width="100" />
+        <el-table-column header-align="center" align="center" prop="creatTime" label="创建时间" min-width="120" />
+        <el-table-column header-align="center" align="center" label="操作" min-width="120">
+          <template #default="scope">
+            <el-button link type="primary" @click="onBtnEditClickHandler(scope.$index, scope.row)">编辑</el-button>
+            <el-button link type="primary" @click="onBtnDeleteClickHandler">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </client-only>
@@ -119,7 +119,7 @@ function onBtnDeleteClickHandler() {
   margin-left: 10px;
 }
 
-.search-btn > span > i{
+.search-btn>span>i {
   margin-left: 0px;
 }
 </style>

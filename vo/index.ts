@@ -20,3 +20,19 @@ export interface SetContentInfo {
   value: string;
   type: string[];
 }
+
+export interface TemplateHistory {
+  nid?: number;
+  userId?: string;
+  templateId?: number;
+  templateName?: string;
+  content?: string;
+  createTime?: string;
+  isDelete?: string;
+  userName?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  iStart?: number;
+  iPageCount?: number;
+  totalCount?: number;
+}

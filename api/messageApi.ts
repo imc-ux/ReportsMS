@@ -5,4 +5,16 @@ const getUserList = (params: any) => {
   return httpRequest.get(service.GetUserList, params);
 };
 
-export { getUserList };
+const getTemplateList = (params: any) => {
+  return httpRequest.get(service.GetTemplateList, params);
+}
+
+const getUserTemplateList = (params: any) => {
+  return httpRequest.get(service.GetUserTemplateList, params);
+}
+
+const deleteUserTemplate = (params: any) => {
+  return httpRequest.get(service.DeleteUserTemplate, params);
+}
+
+export { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate };
