@@ -10,32 +10,46 @@ import { getTemplateList, deleteTemplate } from '~/api/templateApi';
 
 const router = useRouter();
 const title = ref<string>('');
-const templateData = reactive<any[]>([{  //这种写死的都是模拟数据 测ui的时候用一下 不是正式代码 之后删除
-  key: 1,
-  title: '日报模板',
-  creator: '康家旗',
-  creatTime: '2023-12-07',
-},
-{
-  key: 2,
-  title: '周报模板',
-  creator: '康家旗',
-  creatTime: '2023-12-07',
-}]);
+const deleteId = ref<number>(0);
+const templateData = reactive<TemplateInfo[]>([]);
 
 const getTempList = async () => {
   try {
     const info: TemplateInfo = {};
     info.name = title.value;
-    await getTemplateList(info);
+    const res: any = await getTemplateList(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      templateData.length = 0;
+      result.data.forEach((element: any, index: number) => {
+        element.key = index + 1;
+      })
+      templateData.push(...result.data);
+    }
   } catch (error) {
     //console.log(error);
   }
 };
 
+const deleteTempList = async () => {
+  try {
+    const info: TemplateInfo = {};
+    info.nid = deleteId.value;
+    const res: any = await deleteTemplate(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      ShowAlert(CommonAlert.DELETE_DATA_SUCCESS, 0, () => onBtnSearchClickHandler())
+    }
+  } catch (error) {
+    //console.log(error);
+  }
+};
+
+onMounted(() => {
+  getTempList();
+})
 
 function onBtnSearchClickHandler() {
-  // title.value
   getTempList()
 }
 
@@ -44,20 +58,19 @@ function onBtnAddClickHandler() {
 }
 
 function onBtnEditClickHandler(index: number, row: any) {
-  const json = "[{\"value\":\"1\",\"type\":\"input\"},{\"value\":\"2\",\"type\":\"input\"},{\"value\":\"3\",\"type\":\"input\"}]"
-  const jsons = "[{\"value\":\"1\",\"type\":\"input\"},{\"value\":\"2\",\"type\":\"input\"},{\"value\":\"3\",\"type\":\"input\"},{\"value\":\"4\",\"type\":\"input\"}]"
-  router.push({ path: '/template/detail', query: { name: '日报模板', title: json, element: jsons } })
+  router.push({ path: '/template/detail', query: row })
 }
 
-function onBtnDeleteClickHandler() {
-  ShowAlert(CommonAlert.DELETE_DATA_SUCCESS, 0)
+function onBtnDeleteClickHandler(row: any) {
+  deleteId.value = row.nid;
+  deleteTempList();
 }
 
 </script>
 <template>
   <client-only>
     <div>
-      <div class="main-text">
+      <div class="title-text">
         <el-text>标题</el-text>
       </div>
       <div class="main-search-input">
@@ -68,19 +81,18 @@ function onBtnDeleteClickHandler() {
     <div class="split-line-top">
       <div class="right-btn">
         <Button class='btn-icon' @click="onBtnAddClickHandler">创建模板</Button>
-        <!-- <NuxtLink :to="{name: 'templateDetail', params: {com: combinations}}"><Button class='btn-icon' @click="onBtnAddClickHandler">创建模板</Button></NuxtLink> -->
       </div>
     </div>
     <div>
       <el-table :data="templateData" style="width: 100%" border>
         <el-table-column header-align="center" align="center" prop="key" label="序号" min-width="50" />
-        <el-table-column header-align="center" align="center" prop="title" label="模板标题" min-width="200" />
-        <el-table-column header-align="center" align="center" prop="creator" label="创建者" min-width="100" />
-        <el-table-column header-align="center" align="center" prop="creatTime" label="创建时间" min-width="120" />
+        <el-table-column header-align="center" align="center" prop="name" label="模板标题" min-width="200" />
+        <el-table-column header-align="center" align="center" prop="creatorName" label="创建者" min-width="100" />
+        <el-table-column header-align="center" align="center" prop="createTime" label="创建时间" min-width="120" />
         <el-table-column header-align="center" align="center" label="操作" min-width="120">
           <template #default="scope">
             <el-button link type="primary" @click="onBtnEditClickHandler(scope.$index, scope.row)">编辑</el-button>
-            <el-button link type="primary" @click="onBtnDeleteClickHandler">删除</el-button>
+            <el-button link type="primary" @click="onBtnDeleteClickHandler(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

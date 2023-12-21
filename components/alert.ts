@@ -8,7 +8,11 @@ import Alert from "./Alert.vue";
  *       2 question
  *       3 delete
  **/
-export function ShowAlert(message: string, icon: number = 0) {
+export function ShowAlert(
+  message: string,
+  icon: number = 0,
+  onConfirm?: () => void
+) {
   const vNode = h(Alert, { message, icon, close: closeHandler }, {});
 
   const container = document.createElement("div");
@@ -17,5 +21,6 @@ export function ShowAlert(message: string, icon: number = 0) {
 
   function closeHandler() {
     document.body.removeChild(container);
+    onConfirm?.();
   }
 }
