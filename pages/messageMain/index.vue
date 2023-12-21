@@ -1,26 +1,21 @@
 <script lang="ts" setup>
-import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn } from 'element-plus';
-import { ref, reactive, onMounted } from 'vue';
-import { useState } from 'nuxt/app';
-import { getUserList } from '~/api/messageApi';
-import { json } from 'stream/consumers';
+import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
+import { ref, onMounted } from 'vue';
+import { useRouter, useState } from 'nuxt/app';
+import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate } from '~/api/messageApi';
+import { TemplateHistory } from '~/vo';
 
+const router = useRouter()
 const clearable = ref<boolean>(true);
 const dateValue = useState<any>('dateValue', () => '');
 const selectedModel = useState<string>('selectedModel', () => '');
 const selectedUser = useState<string>('selectedUser', () => '');
 const inputMessage = useState<string>('inputMessage', () => '');
-const tableData = useState<any>('tableData', () => null);
-const modelTypes = reactive<any[]>([{
-    value: 'a',
-    label: '日报模板',
-},
-{
-    value: 'b',
-    label: '周报模板',
-}])
-
+const tableData = useState<any>('tableData', () => []);
+const modelTypes = useState<any[]>('modelTypes', () => []);
 const userNames = useState<any[]>('userNames', () => []);
+const iPageCount = 20;
+const totalCount = useState<number>('totalCount', () => 0);
 
 const userList = async () => {
     try {
@@ -39,15 +34,53 @@ const userList = async () => {
     }
 };
 
+const templateList = async () => {
+    try {
+        const info: any = {};
+        const res: any = await getTemplateList(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            modelTypes.value = result.data;
+        }
+    } catch (error) {
 
+    }
+}
 
+const searchInfo = async () => {
+    try {
+        const info: TemplateHistory = {};
+        if (dateValue.value) {
+            const dateStart = dateValue.value[0].toISOString().slice(0, 10);
+            const dateEnd = dateValue.value[1].toISOString().slice(0, 10);
+            info.dateFrom = dateStart;
+            info.dateTo = dateEnd;
+        } else {
+            info.dateFrom = '';
+            info.dateTo = '';
+        }
+        info.content = inputMessage.value;
+        info.userId = selectedUser.value;
+        info.templateId = (Number)(selectedModel.value);
+        info.iPageCount = iPageCount;
+        info.iStart = 0;
+        const res: any = await getUserTemplateList(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+
+        }
+    } catch (error) {
+
+    }
+}
 
 onMounted(() => {
     userList();
+    templateList();
 });
 
 function onSearchHandlerClick() {
-
+    searchInfo();
 }
 
 function onResetHandlerClick() {
@@ -58,12 +91,23 @@ function onResetHandlerClick() {
 }
 
 function onNewMessageHandler() {
+    router.push({ path: '/report' });
+}
+
+function onTabelDetailHandler(index: number, row: any) {
+
+}
+
+function onTabelDeleteHandler(index: number, row: any) {
 
 }
 
 </script>
 <template>
     <client-only>
+        <div style="display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
+            <span style="font-size: x-large;">消息管理</span>
+        </div>
         <div style="width:100%">
             <div style="display: flex; height: 40px; border: 1px solid #cacaca; padding-top: 10px;">
                 <div style="display: flex;width: 480px;">
@@ -81,7 +125,7 @@ function onNewMessageHandler() {
                     </div>
                     <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
                         <el-select v-model="selectedModel" placeholder="请选择" :clearable="clearable">
-                            <el-option v-for="item in modelTypes" :key="item.value" :label="item.label" :value="item.value">
+                            <el-option v-for="item in modelTypes" :key="item.nid" :label="item.name" :value="item.nid">
                             </el-option>
                         </el-select>
                     </div>
@@ -92,7 +136,7 @@ function onNewMessageHandler() {
                     </div>
                     <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
                         <el-select v-model="selectedUser" placeholder="请选择" :clearable="clearable">
-                            <el-option v-for="item in userNames" :key="item.id" :label="item.name" :value="item.id">
+                            <el-option v-for="item in userNames" :key="item.nid" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
                     </div>
@@ -119,16 +163,20 @@ function onNewMessageHandler() {
     </client-only>
     <div style="margin-top: 5px">
         <el-table :data="tableData" border style="width: 100%">
-            <el-table-column header-align="center" align="center" prop="date" label="模板类型" />
-            <el-table-column header-align="center" align="center" prop="name" label="发送人" />
-            <el-table-column header-align="center" align="center" prop="province" label="发送时间" />
+            <el-table-column header-align="center" align="center" prop="templateName" label="模板类型" />
+            <el-table-column header-align="center" align="center" prop="userName" label="发送人" />
+            <el-table-column header-align="center" align="center" prop="createTime" label="发送时间" />
             <el-table-column header-align="center" align="center" label="操作">
-                <template slot-scope="scope">
-                    <el-button type="text" size="small">详细</el-button>
-                    <el-button type="text" size="small">删除</el-button>
+                <template #default="scope">
+                    <el-button type="text" size="small"
+                        @click="onTabelDetailHandler(scope.$index, scope.row)">详细</el-button>
+                    <el-button type="text" size="small"
+                        @click="onTabelDeleteHandler(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination v-if="totalCount > 0" :page-size="iPageCount" layout="prev, pager, next" :total="totalCount">
+        </el-pagination>
     </div>
 </template>
 

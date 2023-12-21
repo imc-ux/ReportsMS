@@ -69,7 +69,6 @@ const editSaveTemplate = async () => {
     info.title = transform(combinations);
     info.element = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
     info.changer = 'kangjiaqi';
-    console.log(info)
     const res: any = await updateTemplate(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
@@ -81,8 +80,7 @@ const editSaveTemplate = async () => {
 };
 
 onMounted(() => {
-  // userList();
-  if (JSON.stringify(route?.query) === '{}') {
+  if (!route.query.name) {
     return;
   } else {
     editType.value = true;

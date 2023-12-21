@@ -24,7 +24,7 @@ const getTempList = async () => {
       result.data.forEach((element: any, index: number) => {
         element.key = index + 1;
       })
-      templateData.push(...result.data); 
+      templateData.push(...result.data);
     }
   } catch (error) {
     //console.log(error);
@@ -54,7 +54,7 @@ function onBtnSearchClickHandler() {
 }
 
 function onBtnAddClickHandler() {
-  router.push({path: '/template/detail'})
+  router.push({ path: '/template/detail' })
 }
 
 function onBtnEditClickHandler(index: number, row: any) {
@@ -81,21 +81,20 @@ function onBtnDeleteClickHandler(row: any) {
     <div class="split-line-top">
       <div class="right-btn">
         <Button class='btn-icon' @click="onBtnAddClickHandler">创建模板</Button>
-        <!-- <NuxtLink :to="{name: 'templateDetail', params: {com: combinations}}"><Button class='btn-icon' @click="onBtnAddClickHandler">创建模板</Button></NuxtLink> -->
       </div>
     </div>
     <div>
       <el-table :data="templateData" style="width: 100%" border>
-      <el-table-column header-align="center" align="center" prop="key" label="序号" min-width="50" />
-      <el-table-column header-align="center" align="center" prop="name" label="模板标题" min-width="200" />
-      <el-table-column header-align="center" align="center" prop="creatorName" label="创建者" min-width="100" />
-      <el-table-column header-align="center" align="center" prop="createTime" label="创建时间" min-width="120" />
-      <el-table-column header-align="center" align="center" label="操作" min-width="120">
-        <template #default="scope">
-          <el-button link type="primary" @click="onBtnEditClickHandler(scope.$index, scope.row)">编辑</el-button>
-          <el-button link type="primary" @click="onBtnDeleteClickHandler(scope.row)" >删除</el-button>
-        </template>
-      </el-table-column>
+        <el-table-column header-align="center" align="center" prop="key" label="序号" min-width="50" />
+        <el-table-column header-align="center" align="center" prop="name" label="模板标题" min-width="200" />
+        <el-table-column header-align="center" align="center" prop="creatorName" label="创建者" min-width="100" />
+        <el-table-column header-align="center" align="center" prop="createTime" label="创建时间" min-width="120" />
+        <el-table-column header-align="center" align="center" label="操作" min-width="120">
+          <template #default="scope">
+            <el-button link type="primary" @click="onBtnEditClickHandler(scope.$index, scope.row)">编辑</el-button>
+            <el-button link type="primary" @click="onBtnDeleteClickHandler(scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </client-only>
@@ -132,7 +131,7 @@ function onBtnDeleteClickHandler(row: any) {
   margin-left: 10px;
 }
 
-.search-btn > span > i{
+.search-btn>span>i {
   margin-left: 0px;
 }
 </style>
