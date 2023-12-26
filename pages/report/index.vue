@@ -1,16 +1,20 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
-import { TemplateInfo } from "~/vo";
+import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "~/vo";
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
 import type { TabsPaneContext } from 'element-plus'
-import { getTemplateList } from '~/api/templateApi';
+import { getTemplateList, createUserTemplate } from '~/api/templateApi';
 
-const reportName  = ref<string>('');
+const templateTitle = ref<string>('');
+const templateElement = ref<string>('');
+const reportName  = ref<number>(0);
 const elementsArr = reactive<any[]>([]);
-const headersArr = reactive<any[]>([]);
+const headersArr = reactive<HeadersArrInfo[]>([]);
+const commonTemplate = ref<TemplateInfo>({});
+const previewTemplate = ref<TemplateHistory>({});
 const TemplateList = reactive<TemplateInfo[]>([]);
 
 const getTempList = async () => {
@@ -21,6 +25,20 @@ const getTempList = async () => {
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       TemplateList.push(...result.data);
+      reportName.value = TemplateList[0].nid as number;
+      refreshTemplate(TemplateList[0]);
+    }
+  } catch (error) {
+    //console.log(error);
+  }
+};
+
+const sendTemplate = async () => {
+  try {
+    const res: any = await createUserTemplate(createReport());
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => refreshTemplate(commonTemplate.value))
     }
   } catch (error) {
     //console.log(error);
@@ -29,46 +47,74 @@ const getTempList = async () => {
 
 onMounted(() => {
   getTempList();
-  reportName.value = TemplateList[0].name as string;
-  refreshTemplate(TemplateList[0]);
 })
 
 function onBtnSendClickHandler() {
-  
+  sendTemplate()
 }
 
-function onBtnAddLineClickHandler(arr: any[]) {
+function onBtnAddLineClickHandler(arr: HeadersArrInfo[]) {
   arr.push(JSON.parse(JSON.stringify(headersArr)));
 }
 
-function onBtnDeleteLineClickHandler(arr: any[], index: number) {
+function onBtnDeleteLineClickHandler(arr: HeadersArrInfo[], index: number) {
   arr.splice(index, 1);
 }
 
-function refreshTemplate(info: any) {
-  elementsArr.push(...JSON.parse(info?.element));
-  headersArr.push(...JSON.parse(info?.title));
+function createReport() {
+  const info: TemplateHistory = {};
+  info.userId = 'kangjiaqi';
+  info.templateId = reportName.value;
+  const sendContent: SendMsgInfo[] = [];
+  elementsArr.forEach(data => {
+    const contentInfo: SendMsgInfo = {};
+    const listsArr: string[][] = [];
+    contentInfo.type = data.value;
+    data.headersArr.forEach((arr: HeadersArrInfo[]) => {
+      const inputValueArr: string[] = [];
+      arr.forEach(info => {
+        inputValueArr.push(info.inputValue as string);
+      });
+      listsArr.push(inputValueArr)
+    });
+    contentInfo.list = listsArr;
+    sendContent.push(contentInfo)
+  });
+  info.content = JSON.stringify(sendContent);
+  info.templateTitle = templateTitle.value;
+  info.templateElement = templateElement.value;
+  return info;
+}
+
+function refreshTemplate(info: TemplateInfo) {
+  previewTemplate.value = {};
+  elementsArr.length = 0;
+  headersArr.length = 0;
+  commonTemplate.value = info;
+  templateTitle.value = info.title as string;
+  templateElement.value = info.element as string;
+  elementsArr.push(...JSON.parse(info.element as string));
+  headersArr.push(...JSON.parse(info.title as string));
   headersArr.forEach((data) => {
     data.inputValue = '';
-    data.type = data.type.split(',');
+    data.type = (data.type as string).split(',');
     data.selectedType = data.type[0];
   })
   elementsArr.forEach(data => {
     data.headersArr = [JSON.parse(JSON.stringify(headersArr))];
   })
+  console.log(elementsArr)
 }
 
 function onBtnTabChangeClickHandler(tab: TabsPaneContext) {
-  elementsArr.length = 0;
-  headersArr.length = 0;
   TemplateList.forEach(element => {
-    if (element.name === tab.props.label)
+    if (element.nid === tab.props.name)
       refreshTemplate(element);
   });
 }
 
 function onBtnPreviewClickHandler() {
-  
+  previewTemplate.value = createReport();
 }
 
 </script>
@@ -81,7 +127,7 @@ function onBtnPreviewClickHandler() {
           type="card"
           @tab-click="onBtnTabChangeClickHandler"
         >
-          <el-tab-pane v-for="item in TemplateList" :key="item.nid" :label="item.name" :name="item.name"/>
+          <el-tab-pane v-for="(item, index) in TemplateList" :key="index" :label="item.name" :name="item.nid"/>
         </el-tabs>
       </div>
       <div class="right-btn">
@@ -133,7 +179,7 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览模板</Button>
       </div>
       <div class="preview-border">
-        
+        <TemplateComponent :templeteAr="previewTemplate"/>
       </div>
     </div>
   </client-only>
