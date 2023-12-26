@@ -5,5 +5,6 @@ export enum service {
   DeleteTemplate = "deleteTemplate", //模板管理删除
   UpdateTemplate = "updateTemplate", //模板管理修改
   GetUserTemplateList = "getUserTemplateList", //消息管理检索
-  DeleteUserTemplate = 'deleteUserTemplate',//消息管理删除
+  DeleteUserTemplate = "deleteUserTemplate", //消息管理删除
+  CreateUserTemplate = "createUserTemplate", //发送消息
 }

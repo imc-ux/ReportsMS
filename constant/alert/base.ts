@@ -6,4 +6,5 @@ export enum CommonAlert {
   HEADER_EMPTY = "表头内容不能为空!",
   HEADER_COMPONENT_EMPTY = "表头控件不能为空!",
   DISTINGUISH_EMPTY = "区分内容不能为空!",
+  MSG_SEND_SUCCESS = "发送成功!",
 }

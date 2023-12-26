@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElSelect, ElOption } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
-import { TemplateInfo, ComponentlistInfo, SetContentInfo } from "~/vo";
+import { TemplateInfo, ComponentlistInfo, SetContentInfo, TemplateHistory, HeadersArrInfo } from "~/vo";
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
 import { createTemplate, updateTemplate} from '~/api/templateApi';
@@ -14,6 +14,7 @@ const title = ref<string>('');
 const distinguish = ref<string>('区分');
 const verticalColumn = ref<string>('');
 const editType = ref<boolean>(false);
+const previewTemplate = ref<TemplateHistory>({});
 const components = reactive<ComponentlistInfo[]>([{
   value: 'input',
   label: 'input',
@@ -75,7 +76,6 @@ const editSaveTemplate = async () => {
       ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => onBtnBackClickHandler())
     }
   } catch (error) {
-    //console.log(error);
   }
 };
 
@@ -92,12 +92,12 @@ function initTemplate() {
   title.value = route.query.name;
   const tempTitleArr = JSON.parse(route.query.title)
   const tempElementArr = JSON.parse(route.query.element)
-  tempTitleArr.forEach((data: any) => {
-    data.type = data.type.split(',')
+  tempTitleArr.forEach((data: HeadersArrInfo) => {
+    data.type = (data.type as string).split(',')
   })
   combinations.splice(0, 2, ...tempTitleArr);
-  tempElementArr.forEach((data: any) => {
-    data.type = data.type.split(',');
+  tempElementArr.forEach((data: HeadersArrInfo) => {
+    data.type = (data.type as string).split(',');
   })
   verticalColumn.value = tempElementArr.shift().value;
   inputLines.splice(0, 2, ...tempElementArr);
@@ -137,7 +137,7 @@ function onBtnSaveClickHandler() {
 }
 
 function transform(arr: SetContentInfo[]) {
-  const tempArr: any[] = JSON.parse(JSON.stringify(arr));
+  const tempArr: SetContentInfo[] = JSON.parse(JSON.stringify(arr));
   tempArr.forEach(data => {
     data.type = String(data.type)
   })
@@ -161,7 +161,11 @@ function onBtnDeleteLineClickHandler(type: string, index: number) {
 }
 
 function onBtnPreviewClickHandler() {
-  
+  const info: TemplateHistory = {};
+  info.templateTitle = transform(combinations);
+  info.templateElement = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
+  info.content = JSON.stringify([]);
+  previewTemplate.value = info;
 }
 
 </script>
@@ -169,7 +173,6 @@ function onBtnPreviewClickHandler() {
   <client-only>
     <div class="split-line">
       <Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button>
-      <!-- <NuxtLink to="/template"><Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button></NuxtLink> -->
       <Button class='btn-icon non-init-button' @click="onBtnSaveClickHandler">保存</Button>
     </div>
     <div class="main-flex">
@@ -231,7 +234,7 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览模板</Button>
       </div>
       <div class="preview-border">
-        
+        <TemplateComponent :templeteAr="previewTemplate"/>
       </div>
     </div>
   </client-only>

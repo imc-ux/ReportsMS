@@ -17,4 +17,14 @@ const deleteTemplate = (params: any) => {
   return httpRequest.get(service.DeleteTemplate, params);
 };
 
-export { createTemplate, updateTemplate, getTemplateList, deleteTemplate };
+const createUserTemplate = (params: any) => {
+  return httpRequest.get(service.CreateUserTemplate, params);
+};
+
+export {
+  createTemplate,
+  updateTemplate,
+  getTemplateList,
+  deleteTemplate,
+  createUserTemplate,
+};
