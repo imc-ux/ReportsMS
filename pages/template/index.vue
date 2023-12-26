@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { Search } from "@element-plus/icons-vue";
 import { TemplateInfo } from "~/vo";
@@ -57,12 +57,12 @@ function onBtnAddClickHandler() {
   router.push({ path: '/template/detail' })
 }
 
-function onBtnEditClickHandler(index: number, row: any) {
+function onBtnEditClickHandler(index: number, row: TemplateInfo) {
   router.push({ path: '/template/detail', query: row })
 }
 
-function onBtnDeleteClickHandler(row: any) {
-  deleteId.value = row.nid;
+function onBtnDeleteClickHandler(row: TemplateInfo) {
+  deleteId.value = row.nid as number;
   deleteTempList();
 }
 
