@@ -36,4 +36,6 @@ export interface TemplateHistory {
   iStart?: number;
   iPageCount?: number;
   totalCount?: number;
+  templateTitle?: string;
+  templateElement?: string;
 }
