@@ -33,13 +33,8 @@ export default {
 </script>
 
 <template>
-    <el-dialog 
-    :model-value="alertVisible" 
-    :show-close="false" 
-    :close-on-click-modal="false" 
-    width="315px" 
-    draggable
-    align-center>
+    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="315px" draggable
+        align-center>
         <div class="alert-content">
             <div v-if="icon === 0" class="icon-box">
                 <el-image style="width: 40px; height: 40px" :src="icon_succeed" :fit="'fill'" />
@@ -53,18 +48,12 @@ export default {
             <div v-else="icon === 3" class="icon-box">
                 <el-image style="width: 40px; height: 40px" :src="icon_delete" :fit="'fill'" />
             </div>
-            <span class="alert-message">{{props.message}}</span>
+            <span class="alert-message">{{ props.message }}</span>
         </div>
         <template #footer>
             <span class="dialog-footer">
                 <Button class="alert-button" :showIcon="false" @click="onBtnCloseHandler()">确定</Button>
-            </span>  
+            </span>
         </template>
     </el-dialog>
 </template>
-
-
-<style>
-
-
-</style>
