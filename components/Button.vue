@@ -25,45 +25,5 @@ const props = withDefaults(defineProps<Props>(), {
 </template>
 
 <style>
-.btn {
-  color: #08adaa;
-  border-color: #08adaa;
-  margin-bottom: 4px;
-  font-size: 13px;
-  font-weight: 400;
-  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, 微软雅黑;
-  margin-top: 5px;
-  border: 1px solid #08adaa;
-  background-color: #fff;
-  height: 30px;
-  width: 100px;
-  min-height: 0rem;
-  border-radius: 0;
-}
 
-.btn:hover {
-  color: #fff;
-  border-color: #08adaa;
-  margin-bottom: 4px;
-  font-size: 13px;
-  font-weight: 400;
-  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, 微软雅黑;
-  margin-top: 5px;
-  border: 1px solid #08adaa;
-  background-color: #08adaa;
-  height: 30px;
-  width: 100px;
-  min-height: 0rem;
-  border-radius: 0;
-}
-
-.el-button {
-  --el-button-hover-text-color: #08adaa;
-  --el-button-hover-bg-color: #fff;
-  --el-button-hover-border-color: #08adaa;
-}
-
-.el-button+.el-button {
-  margin-left: 3px;
-}
 </style>

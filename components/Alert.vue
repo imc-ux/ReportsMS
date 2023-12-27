@@ -65,60 +65,6 @@ export default {
 
 
 <style>
-.el-dialog__header {
-    height: 28px;
-    background-color: #08adaa;
-    padding: 0px;
-    margin: 0px;
-}
 
-.alert-button {
-    width: 66px;
-    height: 24px;
-    font-size: 13px;
-    margin: auto;
-    background-color: #08adaa;
-    color: #fff;
-}
-
-.alert-button:hover {
-    width: 66px;
-    height: 24px;
-    font-size: 13px;
-    margin: auto;
-    background-color: #08adaa;
-    color: #fff;
-}
-
-.el-dialog__footer {
-    height: 40px;
-    padding: 0px;
-    margin: auto;
-    text-align: center;
-}
-
-.alert-content {
-    display: flex;
-    align-items: center;
-    min-height: 70px;
-    width: auto;
-    padding: 0px 15px;
-}
-
-.alert-message {
-    margin-left: 20px;
-    font-size: 14px;
-    font-family: "Helvetica Neue",Helvetica,Roboto,Arial,sans-serif,"微软雅黑";
-    color: #000;
-}
-
-.el-dialog__body {
-    padding: 8px;
-}
-
-.icon-box {
-    width: 40px;
-    height: 40px;
-}
 
 </style>

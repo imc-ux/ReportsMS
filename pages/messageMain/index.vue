@@ -6,7 +6,7 @@ import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate }
 import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
 import { CommonAlert } from '~/constant/alert/base';
-import TemplateComponent from '~/components/TemplateComponent.vue'
+import TemplateMessage from '~/components/TemplateMessage.vue'
 
 const router = useRouter()
 const clearable = ref<boolean>(true);
@@ -228,33 +228,8 @@ function onDeleteTemplateMessageHandler() {
                 <el-button type="primary" @click="onDeleteTemplateMessageHandler">删除</el-button>
             </div>
             <div height="100%" class="split">
-                <TemplateComponent :templeteAr="templateData" />
+                <TemplateMessage :templeteAr="templateData" />
             </div>
         </div>
     </client-only>
 </template>
-
-<style>
-.main-input {
-    display: inline-block;
-    width: 85%;
-}
-
-.el-select {
-    width: 100%;
-}
-
-.el-pagination {
-    justify-content: center;
-}
-
-.split {
-    display: flex;
-    border: 1px solid #cacaca;
-    height: auto;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    justify-content: center;
-    align-items: center;
-}
-</style>

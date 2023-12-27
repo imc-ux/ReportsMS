@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { ElInput, ElText, ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { Search } from "@element-plus/icons-vue";
 import { TemplateInfo } from "~/vo";
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
-import { getUserList } from '~/api/messageApi';
 import { getTemplateList, deleteTemplate } from '~/api/templateApi';
+import { useRouter } from 'nuxt/app';
 
 const router = useRouter();
 const title = ref<string>('');
@@ -57,12 +57,12 @@ function onBtnAddClickHandler() {
   router.push({ path: '/template/detail' })
 }
 
-function onBtnEditClickHandler(index: number, row: any) {
+function onBtnEditClickHandler(index: number, row: TemplateInfo) {
   router.push({ path: '/template/detail', query: row })
 }
 
-function onBtnDeleteClickHandler(row: any) {
-  deleteId.value = row.nid;
+function onBtnDeleteClickHandler(row: TemplateInfo) {
+  deleteId.value = row.nid as number;
   deleteTempList();
 }
 
@@ -99,39 +99,3 @@ function onBtnDeleteClickHandler(row: any) {
     </div>
   </client-only>
 </template>
-
-<style>
-.split-line-top {
-  border-top: 1px solid #cacaca;
-  text-align: right;
-}
-
-.main-search-input {
-  display: inline-block;
-  width: 20%;
-}
-
-.right-btn {
-  display: inline-block;
-}
-
-.search-btn {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 10px;
-}
-
-.search-btn:hover {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 10px;
-}
-
-.search-btn>span>i {
-  margin-left: 0px;
-}
-</style>

@@ -39,3 +39,8 @@ export interface TemplateHistory {
   templateTitle?: string;
   templateElement?: string;
 }
+
+export interface SendMsgInfo {
+  list?: string[][];
+  type?: string;
+}

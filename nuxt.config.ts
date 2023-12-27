@@ -49,6 +49,7 @@ export default {
     "element-plus/dist/index.css",
     "~/assets/css/main.css",
     "~/assets/css/element.css",
+    "~/assets/css/component.css",
   ],
   ssr: false,
 };
