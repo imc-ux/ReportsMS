@@ -6,7 +6,8 @@ import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate }
 import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
 import { CommonAlert } from '~/constant/alert/base';
-import TemplateMessage from '~/components/TemplateMessage.vue'
+import TemplateMessage from '~/components/TemplateMessage.vue';
+import MarkDownTable from '~/components/MarkDownTable.vue';
 
 const router = useRouter()
 const clearable = ref<boolean>(true);
@@ -223,12 +224,15 @@ function onDeleteTemplateMessageHandler() {
             </div>
         </div>
         <div v-show="!showIndex" style="width:100%">
+            <div style="display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
+                <span style="font-size: x-large;">消息管理详细</span>
+            </div>
             <div style="justify-content: flex-end;display: flex; padding-bottom: 5px;">
                 <el-button type="primary" @click="onReturnClickHandler">返回</el-button>
                 <el-button type="primary" @click="onDeleteTemplateMessageHandler">删除</el-button>
             </div>
             <div height="100%" class="split">
-                <TemplateMessage :templeteAr="templateData" />
+                <MarkDownTable :templeteAr="templateData" />
             </div>
         </div>
     </client-only>
