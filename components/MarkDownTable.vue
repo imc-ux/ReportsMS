@@ -11,8 +11,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 function templateTable(info: any) {
-    let text: string = '| 区分 ';
     if (info && info.templateTitle) {
+        let text: string = '| 区分 ';
         let templateTitleArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
         let contentArr = JSON.parse(JSON.parse(JSON.stringify(info.content)));
         for (let i = 0; i < templateTitleArr.length; i++) {
@@ -37,8 +37,10 @@ function templateTable(info: any) {
                 text += '|\n';
             }
         }
+        return text;
+    } else {
+        return '';
     }
-    return text;
 }
 </script>
 
