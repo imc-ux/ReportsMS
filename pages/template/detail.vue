@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive } from 'vue';
+import { useRouter, useRoute } from 'nuxt/app';
 import { ElInput, ElText, ElSelect, ElOption } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
 import { TemplateInfo, ComponentlistInfo, SetContentInfo, TemplateHistory, HeadersArrInfo } from "~/vo";
@@ -234,7 +235,7 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览模板</Button>
       </div>
       <div class="preview-border">
-        <TemplateComponent :templeteAr="previewTemplate"/>
+        <TemplateMessage :templeteAr="previewTemplate"/>
       </div>
     </div>
   </client-only>

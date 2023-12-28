@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive } from 'vue';
+import { useRouter } from 'nuxt/app';
 import { ElInput, ElText, ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { Search } from "@element-plus/icons-vue";
 import { TemplateInfo } from "~/vo";
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
-import { getUserList } from '~/api/messageApi';
 import { getTemplateList, deleteTemplate } from '~/api/templateApi';
 
 const router = useRouter();
@@ -57,13 +57,13 @@ function onBtnAddClickHandler() {
   router.push({ path: '/template/detail' })
 }
 
-function onBtnEditClickHandler(index: number, row: TemplateInfo) {
+function onBtnEditClickHandler(row: TemplateInfo) {
   router.push({ path: '/template/detail', query: row })
 }
 
 function onBtnDeleteClickHandler(row: TemplateInfo) {
   deleteId.value = row.nid as number;
-  deleteTempList();
+  ShowAlert(CommonAlert.WHETHER_DELETE_TEMP, 2, () => deleteTempList())
 }
 
 </script>
@@ -91,7 +91,7 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
         <el-table-column header-align="center" align="center" prop="createTime" label="创建时间" min-width="120" />
         <el-table-column header-align="center" align="center" label="操作" min-width="120">
           <template #default="scope">
-            <el-button link type="primary" @click="onBtnEditClickHandler(scope.$index, scope.row)">编辑</el-button>
+            <el-button link type="primary" @click="onBtnEditClickHandler(scope.row)">编辑</el-button>
             <el-button link type="primary" @click="onBtnDeleteClickHandler(scope.row)">删除</el-button>
           </template>
         </el-table-column>

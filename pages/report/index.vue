@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive } from 'vue';
+import { useRouter } from 'nuxt/app';
 import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
 import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "~/vo";
@@ -7,7 +8,9 @@ import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
 import type { TabsPaneContext } from 'element-plus'
 import { getTemplateList, createUserTemplate } from '~/api/templateApi';
+import { getUserTemplateList } from '~/api/messageApi';
 
+const router = useRouter();
 const templateTitle = ref<string>('');
 const templateElement = ref<string>('');
 const reportName  = ref<number>(0);
@@ -33,6 +36,39 @@ const getTempList = async () => {
   }
 };
 
+const getLastReport = async () => {
+  try {
+    const info: TemplateHistory = {};
+    info.content = '';
+    // info.userId = 'kangjiaqi';
+    info.userId = '';
+    info.templateId = reportName.value;
+    info.iPageCount = 20;
+    info.iStart = 0;
+    const res: any = await getUserTemplateList(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      if (result.data.length === 0) {
+        ShowAlert(CommonAlert.NO_LAST_MSG, 1)
+      }
+      const historyMsg = JSON.parse(result.data[0].content);
+      elementsArr.forEach((data, index) => {
+        if (historyMsg[index].list.length > 1) {
+          console.log(elementsArr);
+          data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
+        }
+        data.headersArr.forEach((arr: HeadersArrInfo[], key: number) => {
+          arr.forEach((ele, id) => {
+            ele.inputValue = historyMsg[index].list[key][id];
+          });
+        });
+      });
+    }
+  } catch (error) {
+
+  }
+}
+
 const sendTemplate = async () => {
   try {
     const res: any = await createUserTemplate(createReport());
@@ -51,6 +87,14 @@ onMounted(() => {
 
 function onBtnSendClickHandler() {
   sendTemplate()
+}
+
+function onBtnBackClickHandler() {
+  router.push({ path: '/messageMain' });
+}
+
+function onBtnFillUpClickHandler() {
+  getLastReport();
 }
 
 function onBtnAddLineClickHandler(arr: HeadersArrInfo[]) {
@@ -103,7 +147,6 @@ function refreshTemplate(info: TemplateInfo) {
   elementsArr.forEach(data => {
     data.headersArr = [JSON.parse(JSON.stringify(headersArr))];
   })
-  console.log(elementsArr)
 }
 
 function onBtnTabChangeClickHandler(tab: TabsPaneContext) {
@@ -131,6 +174,8 @@ function onBtnPreviewClickHandler() {
         </el-tabs>
       </div>
       <div class="right-btn">
+        <Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button>
+        <Button class='btn-icon' @click="onBtnFillUpClickHandler">填充上次消息</Button>
         <Button class='btn-icon' @click="onBtnSendClickHandler">发送</Button>
       </div>
     </div>
@@ -176,10 +221,10 @@ function onBtnPreviewClickHandler() {
         </div>
       </div>
       <div class='transform-btn-location'>
-        <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览模板</Button>
+        <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
       </div>
       <div class="preview-border">
-        <TemplateComponent :templeteAr="previewTemplate"/>
+        <TemplateMessage :templeteAr="previewTemplate"/>
       </div>
     </div>
   </client-only>
