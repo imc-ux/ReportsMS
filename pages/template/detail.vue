@@ -5,8 +5,10 @@ import { Plus, CloseBold } from "@element-plus/icons-vue";
 import { TemplateInfo, ComponentlistInfo, SetContentInfo, TemplateHistory, HeadersArrInfo } from "~/vo";
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
-import { createTemplate, updateTemplate} from '~/api/templateApi';
+import { createTemplate, updateTemplate } from '~/api/templateApi';
 import { getUserList } from '~/api/messageApi';
+import TemplateMessage from '~/components/TemplateMessage.vue'
+import { useRoute, useRouter } from 'nuxt/app';
 
 const router = useRouter();
 const route = useRoute();
@@ -145,9 +147,10 @@ function transform(arr: SetContentInfo[]) {
 }
 
 function onBtnAddLineClickHandler(type: string) {
-  if (type === 'combination') {;
+  if (type === 'combination') {
+    ;
     combinations.push({ value: '', type: ['input'] });
-  } else if (type === 'inputLine'){ 
+  } else if (type === 'inputLine') {
     inputLines.push({ value: '', type: ['input'] });
   }
 }
@@ -192,21 +195,17 @@ function onBtnPreviewClickHandler() {
                 <el-text>表头</el-text>
               </div>
               <div class="main-input settled-input">
-                <el-input v-model="distinguish" disabled/>
+                <el-input v-model="distinguish" disabled />
               </div>
             </div>
             <div v-for="(combination, index) in combinations" :key="index" class="text-empty-margin changeable-input">
               <el-input v-model="combination.value" />
               <el-select class="component-multiple-select" v-model="combination.type" multiple>
-                <el-option
-                  class="options"
-                  v-for="item in components"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
+                <el-option class="options" v-for="item in components" :key="item.value" :label="item.label"
+                  :value="item.value" />
               </el-select>
-              <Button v-if="index > 1" class='delete-btn' :btnIcon="CloseBold" @click="onBtnDeleteLineClickHandler('combination', index)"></Button>
+              <Button v-if="index > 1" class='delete-btn' :btnIcon="CloseBold"
+                @click="onBtnDeleteLineClickHandler('combination', index)"></Button>
               <div v-else class='delete-btn-holder' />
             </div>
           </div>
@@ -216,15 +215,16 @@ function onBtnPreviewClickHandler() {
           <div>
             <div>
               <div class="title-text">
-                <el-text>{{distinguish}}</el-text>
+                <el-text>{{ distinguish }}</el-text>
               </div>
               <div class="main-input">
-                <el-input v-model="verticalColumn"/> 
+                <el-input v-model="verticalColumn" />
               </div>
             </div>
             <div v-for="(inputLine, index) in inputLines" :key="index" class="main-input text-empty-margin">
               <el-input v-model="inputLine.value" />
-              <Button v-if="index > 1" class='delete-btn' :btnIcon="CloseBold" @click="onBtnDeleteLineClickHandler('inputLine', index)"></Button>
+              <Button v-if="index > 1" class='delete-btn' :btnIcon="CloseBold"
+                @click="onBtnDeleteLineClickHandler('inputLine', index)"></Button>
             </div>
           </div>
           <Button class='add-types-btn' :btnIcon="Plus" @click="onBtnAddLineClickHandler('inputLine')"></Button>
@@ -234,134 +234,9 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览模板</Button>
       </div>
       <div class="preview-border">
-        <TemplateComponent :templeteAr="previewTemplate"/>
+        <TemplateMessage :templeteAr="previewTemplate" />
       </div>
     </div>
   </client-only>
 </template>
 
-<style>
-.split-line {
-  border-bottom: 1px solid #cacaca;
-}
-
-.non-init-button {
-  margin-left: 3px;
-}
-
-.content-border {
-  height: 900px;
-  width: 40%;
-  border: 1px solid #cacaca;
-  border-radius: 0;
-  margin-top: 20px;
-  display: inline-block;
-}
-
-.title {
-  margin-bottom: 20px;
-}
-
-.main-input {
-  display: inline-block;
-  width: 85%;
-}
-
-.settled-input {
-  width: 47%;
-  margin-right: 20px;
-  display: inline-block;
-}
-
-.changeable-input {
-  width: 85%;
-  margin-right: 20px;
-  display: inline-block;
-}
-
-.settled-input-height {
-  height: 32px;
-}
-
-.text-empty-margin {
-  margin-left: 60px;
-  height: 32px;
-  display: flex;
-  margin-bottom: 10px;
-}
-
-.text-with-select {
-  margin-left: 60px;
-  height: 40px;
-}
-
-.component-multiple-select {
-  display: inline-block;
-  width: 65%;
-  margin-left: 20px;
-  min-width: 220px;
-}
-
-.add-types-btn {
-  width: 30px;
-  height: 30px;
-  margin-left: 60px;
-  margin-bottom: 10px;
-}
-
-.add-types-btn:hover {
-  width: 30px;
-  height: 30px;
-  margin-left: 60px;
-  margin-bottom: 10px;
-}
-
-.add-types-btn > span > i{
-  margin-left: 0px;
-}
-
-.gauge-outfit {
-  margin-bottom: 20px;
-}
-
-.transform-btn-location {
-  width: 20%;
-  margin: auto;
-}
-
-.transform-btn {
-  display: block;
-  margin: 0 auto;
-}
-
-.preview-border {
-  height: 900px;
-  width: 40%;
-  border: 1px solid #cacaca;
-  border-radius: 0;
-  margin-top: 20px;
-  display: inline-block;
-}
-
-.delete-btn {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-left: 10px;
-}
-
-.delete-btn:hover {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-left: 10px;
-}
-
-.delete-btn > span > i{
-  margin-left: 0px;
-}
-
-.delete-btn-holder {
-  width: 77px;
-}
-</style>

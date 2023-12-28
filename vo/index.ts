@@ -19,20 +19,7 @@ export interface ComponentlistInfo {
 
 export interface SetContentInfo {
   value: string;
-  type: string[] | string;
-}
-
-export interface ElementsArrInfo {
-  value?: string;
-  type?: string;
-  headersArr: HeadersArrInfo[];
-}
-
-export interface HeadersArrInfo {
-  value?: string;
-  inputValue?: string;
-  selectedType?: string;
-  type: string[] | string;
+  type: string[];
 }
 
 export interface TemplateHistory {

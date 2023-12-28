@@ -33,13 +33,8 @@ export default {
 </script>
 
 <template>
-    <el-dialog 
-    :model-value="alertVisible" 
-    :show-close="false" 
-    :close-on-click-modal="false" 
-    width="315px" 
-    draggable
-    align-center>
+    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="315px" draggable
+        align-center>
         <div class="alert-content">
             <div v-if="icon === 0" class="icon-box">
                 <el-image style="width: 40px; height: 40px" :src="icon_succeed" :fit="'fill'" />
@@ -53,72 +48,12 @@ export default {
             <div v-else="icon === 3" class="icon-box">
                 <el-image style="width: 40px; height: 40px" :src="icon_delete" :fit="'fill'" />
             </div>
-            <span class="alert-message">{{props.message}}</span>
+            <span class="alert-message">{{ props.message }}</span>
         </div>
         <template #footer>
             <span class="dialog-footer">
                 <Button class="alert-button" :showIcon="false" @click="onBtnCloseHandler()">确定</Button>
-            </span>  
+            </span>
         </template>
     </el-dialog>
 </template>
-
-
-<style>
-.el-dialog__header {
-    height: 28px;
-    background-color: #08adaa;
-    padding: 0px;
-    margin: 0px;
-}
-
-.alert-button {
-    width: 66px;
-    height: 24px;
-    font-size: 13px;
-    margin: auto;
-    background-color: #08adaa;
-    color: #fff;
-}
-
-.alert-button:hover {
-    width: 66px;
-    height: 24px;
-    font-size: 13px;
-    margin: auto;
-    background-color: #08adaa;
-    color: #fff;
-}
-
-.el-dialog__footer {
-    height: 40px;
-    padding: 0px;
-    margin: auto;
-    text-align: center;
-}
-
-.alert-content {
-    display: flex;
-    align-items: center;
-    min-height: 70px;
-    width: auto;
-    padding: 0px 15px;
-}
-
-.alert-message {
-    margin-left: 20px;
-    font-size: 14px;
-    font-family: "Helvetica Neue",Helvetica,Roboto,Arial,sans-serif,"微软雅黑";
-    color: #000;
-}
-
-.el-dialog__body {
-    padding: 8px;
-}
-
-.icon-box {
-    width: 40px;
-    height: 40px;
-}
-
-</style>
