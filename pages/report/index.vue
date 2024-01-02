@@ -32,7 +32,6 @@ const getTempList = async () => {
       refreshTemplate(TemplateList[0]);
     }
   } catch (error) {
-    //console.log(error);
   }
 };
 
@@ -40,8 +39,7 @@ const getLastReport = async () => {
   try {
     const info: TemplateHistory = {};
     info.content = '';
-    // info.userId = 'kangjiaqi';
-    info.userId = '';
+    info.userId = 'kangjiaqi';
     info.templateId = reportName.value;
     info.iPageCount = 20;
     info.iStart = 0;
@@ -54,7 +52,6 @@ const getLastReport = async () => {
       const historyMsg = JSON.parse(result.data[0].content);
       elementsArr.forEach((data, index) => {
         if (historyMsg[index].list.length > 1) {
-          console.log(elementsArr);
           data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
         }
         data.headersArr.forEach((arr: HeadersArrInfo[], key: number) => {
@@ -65,7 +62,6 @@ const getLastReport = async () => {
       });
     }
   } catch (error) {
-
   }
 }
 
@@ -74,10 +70,9 @@ const sendTemplate = async () => {
     const res: any = await createUserTemplate(createReport());
     let result = JSON.parse(res.data.value);
     if (!result.error) {
-      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => refreshTemplate(commonTemplate.value))
+      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: {type :'search'} }) })
     }
   } catch (error) {
-    //console.log(error);
   }
 };
 
@@ -86,7 +81,23 @@ onMounted(() => {
 })
 
 function onBtnSendClickHandler() {
-  sendTemplate()
+  try {
+    elementsArr.forEach(data => {
+      data.headersArr.forEach((arr: HeadersArrInfo[]) => {
+        try {
+          arr.forEach((info, index) => {
+            if (!info.inputValue && index === 0) {
+              ShowAlert(`${data.value}中${info.value}未填写!`, 1)
+              throw new Error();
+            }
+          });
+        } finally {
+        }
+      });
+    });
+    sendTemplate();
+  } catch (e) { 
+  }
 }
 
 function onBtnBackClickHandler() {
@@ -200,7 +211,7 @@ function onBtnPreviewClickHandler() {
                 <el-input
                   v-if="unit.selectedType === 'batchInput'"
                   v-model="unit.inputValue"
-                  :autosize="{ minRows: 2 }"
+                  :autosize="{ minRows: 2, maxRows: 4 }"
                   type="textarea"
                 />
                 <el-select class="component-select" v-model="unit.selectedType" :disabled="unit.type.length === 1">
@@ -224,7 +235,7 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
       </div>
       <div class="preview-border">
-        <TemplateMessage :templeteAr="previewTemplate"/>
+        <MarkDownTable :templeteAr="previewTemplate"/>
       </div>
     </div>
   </client-only>

@@ -40,13 +40,8 @@ export default {
 </script>
 
 <template>
-    <el-dialog 
-    :model-value="alertVisible" 
-    :show-close="false" 
-    :close-on-click-modal="false" 
-    width="315px" 
-    draggable
-    align-center>
+    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="315px" draggable
+        align-center>
         <div class="alert-content">
             <div v-if="icon === 0" class="icon-box">
                 <el-image style="width: 40px; height: 40px" :src="icon_succeed" :fit="'fill'" />
@@ -60,18 +55,18 @@ export default {
             <div v-else="icon === 3" class="icon-box">
                 <el-image style="width: 40px; height: 40px" :src="icon_delete" :fit="'fill'" />
             </div>
-            <span class="alert-message">{{props.message}}</span>
+            <span class="alert-message">{{ props.message }}</span>
         </div>
         <template #footer>
             <span v-if="icon === 2" class="dialog-footer">
                 <Button class="alert-button" :showIcon="false" @click="onBtnConfirmHandler()">Yes</Button>
-            </span> 
+            </span>
             <span v-if="icon === 2">
                 <Button class="alert-button" :showIcon="false" @click="onBtnCloseHandler()">No</Button>
-            </span> 
+            </span>
             <span v-else>
                 <Button class="alert-button" :showIcon="false" @click="onBtnConfirmHandler()">确定</Button>
-            </span> 
+            </span>
         </template>
     </el-dialog>
 </template>
@@ -121,7 +116,7 @@ export default {
 .alert-message {
     margin-left: 20px;
     font-size: 14px;
-    font-family: "Helvetica Neue",Helvetica,Roboto,Arial,sans-serif,"微软雅黑";
+    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
     color: #000;
 }
 

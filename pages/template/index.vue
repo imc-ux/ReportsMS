@@ -27,7 +27,6 @@ const getTempList = async () => {
       templateData.push(...result.data);
     }
   } catch (error) {
-    //console.log(error);
   }
 };
 
@@ -41,7 +40,6 @@ const deleteTempList = async () => {
       ShowAlert(CommonAlert.DELETE_DATA_SUCCESS, 0, () => onBtnSearchClickHandler())
     }
   } catch (error) {
-    //console.log(error);
   }
 };
 
@@ -70,13 +68,18 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 <template>
   <client-only>
     <div>
-      <div class="title-text">
-        <el-text>标题</el-text>
+      <div class="page-name">
+        <span>模板管理</span>
       </div>
-      <div class="main-search-input">
-        <el-input v-model="title" />
+      <div class="search-condition">
+        <div class="main-title-text">
+          <el-text>标题</el-text>
+        </div>
+        <div class="main-search-input">
+          <el-input v-model="title" />
+        </div>
+        <Button class='search-btn' :btnIcon="Search" @click="onBtnSearchClickHandler"></Button>
       </div>
-      <Button class='search-btn' :btnIcon="Search" @click="onBtnSearchClickHandler"></Button>
     </div>
     <div class="split-line-top">
       <div class="right-btn">
@@ -101,37 +104,62 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 </template>
 
 <style>
-.split-line-top {
-  border-top: 1px solid #cacaca;
-  text-align: right;
-}
+  .page-name {
+    display: flex;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 100%;
+  }
 
-.main-search-input {
-  display: inline-block;
-  width: 20%;
-}
+  .page-name>span {
+    font-size: x-large;
+  }
 
-.right-btn {
-  display: inline-block;
-}
+  .main-title-text {
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
+    margin-left: 10px;
+    width: 40px;
+    height: 30px;
+    line-height: 30px;
+    display: inline-block;
+  }
 
-.search-btn {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 10px;
-}
+  .main-search-input {
+    display: inline-block;
+    width: 20%;
+  }
 
-.search-btn:hover {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 10px;
-}
+  .right-btn {
+    display: inline-block;
+  }
 
-.search-btn>span>i {
-  margin-left: 0px;
-}
+  .search-condition {
+    display: flex; 
+    height: 40px; 
+    border: 1px solid #cacaca; 
+    padding-top: 10px;
+  }
+
+  .search-btn {
+    width: 32px;
+    height: 32px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 10px;
+  }
+
+  .search-btn:hover {
+    width: 32px;
+    height: 32px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 10px;
+  }
+
+  .search-btn>span>i {
+    margin-left: 0px;
+  }
 </style>

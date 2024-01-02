@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 import { ref, onMounted } from 'vue';
-import { useRouter, useState } from 'nuxt/app';
+import { useRouter, useRoute, useState } from 'nuxt/app';
 import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate } from '~/api/messageApi';
 import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
 import { CommonAlert } from '~/constant/alert/base';
+import TemplateMessage from '~/components/TemplateMessage.vue';
+import MarkDownTable from '~/components/MarkDownTable.vue';
 
-const router = useRouter()
+const router = useRouter();
+const route = useRoute();
 const clearable = ref<boolean>(true);
 const dateValue = useState<any>('dateValue', () => '');
 const selectedModel = useState<string>('selectedModel', () => '');
@@ -69,7 +72,6 @@ const searchInfo = async () => {
         }
         info.iPageCount = iPageCount;
         info.iStart = (iPage.value - 1) * iPageCount;
-        console.log(info)
         const res: any = await getUserTemplateList(info);
         let result = JSON.parse(res.data.value);
         if (!result.error) {
@@ -102,6 +104,9 @@ const deleteTemplate = async () => {
 }
 
 onMounted(() => {
+    if (route.query?.type === 'search') {
+        onSearchHandlerClick();
+    }
     userList();
     templateList();
 });
@@ -223,24 +228,16 @@ function onDeleteTemplateMessageHandler() {
             </div>
         </div>
         <div v-show="!showIndex" style="width:100%">
+            <div style="display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
+                <span style="font-size: x-large;">消息管理详细</span>
+            </div>
             <div style="justify-content: flex-end;display: flex; padding-bottom: 5px;">
                 <el-button type="primary" @click="onReturnClickHandler">返回</el-button>
                 <el-button type="primary" @click="onDeleteTemplateMessageHandler">删除</el-button>
             </div>
             <div height="100%" class="split">
-                <TemplateMessage :templeteAr="templateData" />
+                <MarkDownTable :templeteAr="templateData" />
             </div>
         </div>
     </client-only>
 </template>
-
-<style>
-.main-input {
-    display: inline-block;
-    width: 85%;
-}
-
-.el-select {
-    width: 100%;
-}
-</style>

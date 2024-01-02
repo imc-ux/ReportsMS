@@ -179,3 +179,21 @@
   --el-input-focus-border-color: #08adaa;
   --el-input-width: 100%;
 }
+
+.el-select {
+  width: 100%;
+}
+
+.el-pagination {
+  justify-content: center;
+}
+
+.el-button {
+  --el-button-hover-text-color: #08adaa;
+  --el-button-hover-bg-color: #fff;
+  --el-button-hover-border-color: #08adaa;
+}
+
+.el-button + .el-button {
+  margin-left: 3px;
+}
