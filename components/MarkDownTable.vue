@@ -14,6 +14,7 @@ function templateTable(info: any) {
     if (info && info.templateTitle) {
         let text: string = '| 区分 ';
         let templateTitleArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
+        let elementArr = JSON.parse(JSON.parse(JSON.stringify(info.templateElement)));
         let contentArr = JSON.parse(JSON.parse(JSON.stringify(info.content)));
         for (let i = 0; i < templateTitleArr.length; i++) {
             text += '| ' + templateTitleArr[i].value;
@@ -23,16 +24,26 @@ function templateTable(info: any) {
             text += '| -'
         }
         text += '|\n';
-        for (let z = 0; z < contentArr.length; z++) {
-            for (let y = 0; y < contentArr[z].list.length; y++) {
-                if (y === 0) {
-                    text += '| ' + contentArr[z].type;
-                } else {
-                    text += '| ';
+        if (contentArr && contentArr.length > 0) {
+            for (let z = 0; z < contentArr.length; z++) {
+                for (let y = 0; y < contentArr[z].list.length; y++) {
+                    if (y === 0) {
+                        text += '| ' + contentArr[z].type;
+                    } else {
+                        text += '| ';
+                    }
+                    let list = contentArr[z].list[y];
+                    for (let x = 0; x < list.length; x++) {
+                        text += '| ' + String(list[x]).replaceAll('\n', '<br>');
+                    }
+                    text += '|\n';
                 }
-                let list = contentArr[z].list[y];
-                for (let x = 0; x < list.length; x++) {
-                    text += '| ' + list[x];
+            }
+        } else {
+            for (let f = 0; f < elementArr.length; f++) {
+                text += '| ' + elementArr[f].value;
+                for (let l = 0; l < templateTitleArr.length; l++) {
+                    text += '| ';
                 }
                 text += '|\n';
             }

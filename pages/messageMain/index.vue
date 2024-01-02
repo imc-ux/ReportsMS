@@ -6,7 +6,6 @@ import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate }
 import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
 import { CommonAlert } from '~/constant/alert/base';
-import TemplateMessage from '~/components/TemplateMessage.vue';
 import MarkDownTable from '~/components/MarkDownTable.vue';
 
 const router = useRouter()
@@ -59,8 +58,8 @@ const searchInfo = async () => {
     try {
         const info: TemplateHistory = {};
         if (dateValue.value) {
-            const dateStart = dateValue.value[0].toISOString().slice(0, 10);
-            const dateEnd = dateValue.value[1].toISOString().slice(0, 10);
+            const dateStart = getDateFormat(dateValue.value[0]);
+            const dateEnd = getDateFormat(dateValue.value[1]);
             info.dateFrom = dateStart;
             info.dateTo = dateEnd;
         }
@@ -100,6 +99,29 @@ const deleteTemplate = async () => {
     } catch (error) {
 
     }
+}
+
+function getDateFormat(date: any) {
+    const today = new Date(date)
+    let year = today.getFullYear();
+    if (year < 1900) {
+        year = year + 1900;
+    }
+    let monthStr: string = '';
+    let month = today.getMonth() + 1;
+    if (month < 10) {
+        monthStr = '0' + month;
+    } else {
+        monthStr = month.toString();
+    }
+    let dayStr: string = '';
+    let day = today.getDate();
+    if (day < 10) {
+        dayStr = '0' + day;
+    } else {
+        dayStr = day.toString();
+    }
+    return year + '-' + monthStr + '-' + dayStr;
 }
 
 onMounted(() => {
@@ -150,13 +172,13 @@ function onDeleteTemplateMessageHandler() {
 </script>
 <template>
     <client-only>
-        <div v-show="showIndex" style="width:100%">
+        <div v-show="showIndex" style="width:100%;min-width: 1267px">
             <div style="display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
                 <span style="font-size: x-large;">消息管理</span>
             </div>
-            <div style="display: flex; height: 40px; border: 1px solid #cacaca; padding-top: 10px;">
+            <div style="display: flex; height: 40px; border: 1px solid #cacaca;align-items: center;">
                 <div style="display: flex;width: 480px;">
-                    <div style="width:80px;margin-left: 5px;">
+                    <div style="width:80px;margin-left: 5px;margin-top: 4px;">
                         <span>发送时间</span>
                     </div>
                     <div style="width:380px;">
@@ -165,7 +187,7 @@ function onDeleteTemplateMessageHandler() {
                     </div>
                 </div>
                 <div style="display: flex;flex-grow: 1;">
-                    <div style="width:80px;margin-left: 5px;">
+                    <div style="width:80px;margin-left: 5px;margin-top: 4px">
                         <span>模板类型</span>
                     </div>
                     <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
@@ -176,7 +198,7 @@ function onDeleteTemplateMessageHandler() {
                     </div>
                 </div>
                 <div style="display: flex;flex-grow: 1;">
-                    <div style="width:64px;margin-left: 20px;">
+                    <div style="width:64px;margin-left: 20px;margin-top: 4px">
                         <span>发送人</span>
                     </div>
                     <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
@@ -187,7 +209,7 @@ function onDeleteTemplateMessageHandler() {
                     </div>
                 </div>
                 <div style="display: flex;flex-grow: 1;">
-                    <div style="width:100px;margin-left: 20px;">
+                    <div style="width:100px;margin-left: 20px;margin-top: 4px">
                         <span>发送内容</span>
                     </div>
                     <div class="main-input" style="margin-left: 5px;margin-right: 5px;">
@@ -205,7 +227,7 @@ function onDeleteTemplateMessageHandler() {
                 </div>
             </div>
             <div style="margin-top: 5px">
-                <el-table :data="tableData" border style="width: 100%">
+                <el-table :data="tableData" border style="width: 100%" max-height="800px">
                     <el-table-column header-align="center" align="center" prop="templateName" label="模板类型" />
                     <el-table-column header-align="center" align="center" prop="userName" label="发送人" />
                     <el-table-column header-align="center" align="center" prop="createTime" label="发送时间" />
@@ -218,13 +240,13 @@ function onDeleteTemplateMessageHandler() {
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-pagination v-if="totalCount > 0" :page-size="iPageCount" layout="total, prev, pager, next"
-                    :total="totalCount" @current-change="handleCurrentChange">
+                <el-pagination v-if="totalCount > 0" :page-size="iPageCount" :currentPage="iPage"
+                    layout="total, prev, pager, next" :total="totalCount" @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>
-        <div v-show="!showIndex" style="width:100%">
-            <div style="display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
+        <div v-show="!showIndex" style="width:100%;min-width: 1267px">
+            <div style=" display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
                 <span style="font-size: x-large;">消息管理详细</span>
             </div>
             <div style="justify-content: flex-end;display: flex; padding-bottom: 5px;">
