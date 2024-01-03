@@ -13,14 +13,27 @@ export function ShowAlert(
   icon: number = 0,
   onConfirm?: () => void
 ) {
-  const vNode = h(Alert, { message, icon, close: closeHandler }, {});
+  const vNode = h(
+    Alert,
+    {
+      message,
+      icon,
+      confirmHandler: btnConfirmClickHandler,
+      close: closeHandler,
+    },
+    {}
+  );
 
   const container = document.createElement("div");
   document.body.appendChild(container);
   render(vNode, container);
 
-  function closeHandler() {
+  function btnConfirmClickHandler() {
     document.body.removeChild(container);
     onConfirm?.();
+  }
+
+  function closeHandler() {
+    document.body.removeChild(container);
   }
 }

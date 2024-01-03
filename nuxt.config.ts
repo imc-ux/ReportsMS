@@ -2,6 +2,7 @@ export default {
   title: "ReportsMS",
   devServer: {
     host: "127.0.0.1",
+    // host: "109.14.6.212",
     port: 8080,
   },
   test: /\.ts$/,
@@ -52,4 +53,8 @@ export default {
     "~/assets/css/component.css",
   ],
   ssr: false,
+  app: {
+    baseURL: "/cusys/reportsMS/",
+    buildAssetsDir: "/public/",
+  },
 };

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 import { ref, onMounted } from 'vue';
-import { useRouter, useState } from 'nuxt/app';
+import { useRouter, useRoute, useState } from 'nuxt/app';
 import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate } from '~/api/messageApi';
 import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
@@ -9,7 +9,8 @@ import { CommonAlert } from '~/constant/alert/base';
 import MarkDownTable from '~/components/MarkDownTable.vue';
 import { format } from "date-fns";
 
-const router = useRouter()
+const router = useRouter();
+const route = useRoute();
 const clearable = ref<boolean>(true);
 const dateValue = useState<any>('dateValue', () => '');
 const selectedModel = useState<string>('selectedModel', () => '');
@@ -101,6 +102,9 @@ const deleteTemplate = async () => {
 }
 
 onMounted(() => {
+    if (route.query?.type === 'search') {
+        onSearchHandlerClick();
+    }
     userList();
     templateList();
 });

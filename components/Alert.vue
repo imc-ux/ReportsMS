@@ -11,6 +11,7 @@ const alertVisible = ref(true);
 interface Props {
     message?: string;
     icon?: number;
+    confirmHandler?: () => void
     close: () => void;
 }
 
@@ -18,6 +19,12 @@ const props = withDefaults(defineProps<Props>(), {
     message: '',
     icon: 0,
 });
+
+
+function onBtnConfirmHandler() {
+    alertVisible.value = false
+    props.confirmHandler?.()
+}
 
 function onBtnCloseHandler() {
     alertVisible.value = false
@@ -51,9 +58,78 @@ export default {
             <span class="alert-message">{{ props.message }}</span>
         </div>
         <template #footer>
-            <span class="dialog-footer">
-                <Button class="alert-button" :showIcon="false" @click="onBtnCloseHandler()">确定</Button>
+            <span v-if="icon === 2" class="dialog-footer">
+                <Button class="alert-button" :showIcon="false" @click="onBtnConfirmHandler()">Yes</Button>
+            </span>
+            <span v-if="icon === 2">
+                <Button class="alert-button" :showIcon="false" @click="onBtnCloseHandler()">No</Button>
+            </span>
+            <span v-else>
+                <Button class="alert-button" :showIcon="false" @click="onBtnConfirmHandler()">确定</Button>
             </span>
         </template>
     </el-dialog>
 </template>
+
+
+<style>
+.el-dialog__header {
+    height: 28px;
+    background-color: #08adaa;
+    padding: 0px;
+    margin: 0px;
+}
+
+.alert-button {
+    width: 66px;
+    height: 24px;
+    font-size: 13px;
+    margin: auto;
+    background-color: #08adaa;
+    color: #fff;
+}
+
+.alert-button:hover {
+    width: 66px;
+    height: 24px;
+    font-size: 13px;
+    margin: auto;
+    background-color: #08adaa;
+    color: #fff;
+}
+
+.el-dialog__footer {
+    height: 40px;
+    padding: 0px;
+    margin: auto;
+    text-align: center;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    min-height: 70px;
+    width: auto;
+    padding: 0px 15px;
+}
+
+.alert-message {
+    margin-left: 20px;
+    font-size: 14px;
+    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
+    color: #000;
+}
+
+.el-dialog__body {
+    padding: 8px;
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+}
+
+.dialog-footer {
+    margin-right: 60px;
+}
+</style>

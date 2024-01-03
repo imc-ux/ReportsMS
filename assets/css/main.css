@@ -1,6 +1,7 @@
 /* 全局css */
 .main-flex {
   display: flex;
+  min-width: 1150px;
 }
 
 .btn-icon > span > i {
@@ -42,15 +43,6 @@
 
 .non-init-button {
   margin-left: 3px;
-}
-
-.content-border {
-  height: 900px;
-  width: 40%;
-  border: 1px solid #cacaca;
-  border-radius: 0;
-  margin-top: 20px;
-  display: inline-block;
 }
 
 .title {
@@ -161,7 +153,6 @@
 }
 
 .split-line-top {
-  border-top: 1px solid #cacaca;
   text-align: right;
 }
 
@@ -174,29 +165,7 @@
   display: inline-block;
 }
 
-.search-btn {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 10px;
-}
-
-.search-btn:hover {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 10px;
-}
-
-.search-btn > span > i {
-  margin-left: 0px;
-}
-
 .content {
   display: flex;
   flex-direction: column;
 }
-
-
