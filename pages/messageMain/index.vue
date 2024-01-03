@@ -7,6 +7,7 @@ import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
 import { CommonAlert } from '~/constant/alert/base';
 import MarkDownTable from '~/components/MarkDownTable.vue';
+import { format } from "date-fns";
 
 const router = useRouter()
 const clearable = ref<boolean>(true);
@@ -58,10 +59,8 @@ const searchInfo = async () => {
     try {
         const info: TemplateHistory = {};
         if (dateValue.value) {
-            const dateStart = getDateFormat(dateValue.value[0]);
-            const dateEnd = getDateFormat(dateValue.value[1]);
-            info.dateFrom = dateStart;
-            info.dateTo = dateEnd;
+            info.dateFrom = format(dateValue.value[0], "yyyy-MM-dd");
+            info.dateTo = format(dateValue.value[1], "yyyy-MM-dd");
         }
         info.content = inputMessage.value;
         info.userId = selectedUser.value;
@@ -99,29 +98,6 @@ const deleteTemplate = async () => {
     } catch (error) {
 
     }
-}
-
-function getDateFormat(date: any) {
-    const today = new Date(date)
-    let year = today.getFullYear();
-    if (year < 1900) {
-        year = year + 1900;
-    }
-    let monthStr: string = '';
-    let month = today.getMonth() + 1;
-    if (month < 10) {
-        monthStr = '0' + month;
-    } else {
-        monthStr = month.toString();
-    }
-    let dayStr: string = '';
-    let day = today.getDate();
-    if (day < 10) {
-        dayStr = '0' + day;
-    } else {
-        dayStr = day.toString();
-    }
-    return year + '-' + monthStr + '-' + dayStr;
 }
 
 onMounted(() => {
