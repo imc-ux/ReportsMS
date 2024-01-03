@@ -13,29 +13,39 @@ const props = withDefaults(defineProps<Props>(), {
 function templateTable(info: any) {
     if (info && info.templateTitle) {
         let text: string = '| 区分 ';
-        let templateTitleArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
-        let contentArr = JSON.parse(JSON.parse(JSON.stringify(info.content)));
-        for (let i = 0; i < templateTitleArr.length; i++) {
-            text += '| ' + templateTitleArr[i].value;
-        }
+        const templateTitleArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
+        const elementArr = JSON.parse(JSON.parse(JSON.stringify(info.templateElement)));
+        const contentArr = JSON.parse(JSON.parse(JSON.stringify(info.content)));
+        templateTitleArr.forEach((data: any) => {
+            text += '| ' + data.value;
+        });
         text += '| \n | :---:';
-        for (let j = 0; j < templateTitleArr.length; j++) {
+        templateTitleArr.forEach((_title: any) => {
             text += '| -'
-        }
+        });
         text += '|\n';
-        for (let z = 0; z < contentArr.length; z++) {
-            for (let y = 0; y < contentArr[z].list.length; y++) {
-                if (y === 0) {
-                    text += '| ' + contentArr[z].type;
-                } else {
+        if (contentArr && contentArr.length > 0) {
+            contentArr?.forEach((elem: any) => {
+                elem.list?.forEach((element: any, index: number) => {
+                    if (index === 0) {
+                        text += '| ' + elem.type;
+                    } else {
+                        text += '| ';
+                    }
+                    element?.forEach((data: any) => {
+                        text += '| ' + String(data).replaceAll('\n', '<br>');
+                    });
+                    text += '|\n';
+                });
+            })
+        } else {
+            elementArr?.forEach((elem: any) => {
+                text += '| ' + elem.value;
+                templateTitleArr?.forEach((_element: any) => {
                     text += '| ';
-                }
-                let list = contentArr[z].list[y];
-                for (let x = 0; x < list.length; x++) {
-                    text += '| ' + list[x];
-                }
+                });
                 text += '|\n';
-            }
+            })
         }
         return text;
     } else {
