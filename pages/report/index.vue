@@ -73,7 +73,7 @@ const sendTemplate = async () => {
     const res: any = await createUserTemplate(createReport());
     let result = JSON.parse(res.data.value);
     if (!result.error) {
-      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain' }) })
+      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) })
     }
   } catch (error) {
   }
