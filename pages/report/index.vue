@@ -51,9 +51,12 @@ const getLastReport = async () => {
       }
       const historyMsg = JSON.parse(result.data[0].content);
       elementsArr.forEach((data, index) => {
-        if (historyMsg[index].list.length > 1) {
+        for (let i = 0; i < historyMsg[index].list.length - 1; i++) {
+          if(data.headersArr.length < historyMsg[index].list.length)
           data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
         }
+      });
+      elementsArr.forEach((data, index) => {
         data.headersArr.forEach((arr: HeadersArrInfo[], key: number) => {
           arr.forEach((ele, id) => {
             ele.inputValue = historyMsg[index].list[key][id];
@@ -70,7 +73,7 @@ const sendTemplate = async () => {
     const res: any = await createUserTemplate(createReport());
     let result = JSON.parse(res.data.value);
     if (!result.error) {
-      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: {type :'search'} }) })
+      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain' }) })
     }
   } catch (error) {
   }

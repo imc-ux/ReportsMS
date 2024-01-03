@@ -6,7 +6,6 @@ import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate }
 import { TemplateHistory } from '~/vo';
 import { ShowAlert } from '~/components/alert';
 import { CommonAlert } from '~/constant/alert/base';
-import TemplateMessage from '~/components/TemplateMessage.vue';
 import MarkDownTable from '~/components/MarkDownTable.vue';
 
 const router = useRouter();
