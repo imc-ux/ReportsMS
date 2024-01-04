@@ -9,11 +9,12 @@ import { ShowAlert } from '~/components/alert';
 import type { TabsPaneContext } from 'element-plus'
 import { getTemplateList, createUserTemplate } from '~/api/templateApi';
 import { getUserTemplateList } from '~/api/messageApi';
+import { UserInfo } from "@/utils/Settings";
 
 const router = useRouter();
 const templateTitle = ref<string>('');
 const templateElement = ref<string>('');
-const reportName  = ref<number>(0);
+const reportName = ref<number>(0);
 const elementsArr = reactive<any[]>([]);
 const headersArr = reactive<HeadersArrInfo[]>([]);
 const commonTemplate = ref<TemplateInfo>({});
@@ -39,7 +40,7 @@ const getLastReport = async () => {
   try {
     const info: TemplateHistory = {};
     info.content = '';
-    info.userId = 'kangjiaqi';
+    info.userId = UserInfo.userId;
     info.templateId = reportName.value;
     info.iPageCount = 20;
     info.iStart = 0;
@@ -52,8 +53,8 @@ const getLastReport = async () => {
       const historyMsg = JSON.parse(result.data[0].content);
       elementsArr.forEach((data, index) => {
         for (let i = 0; i < historyMsg[index].list.length - 1; i++) {
-          if(data.headersArr.length < historyMsg[index].list.length)
-          data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
+          if (data.headersArr.length < historyMsg[index].list.length)
+            data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
         }
       });
       elementsArr.forEach((data, index) => {
@@ -99,7 +100,7 @@ function onBtnSendClickHandler() {
       });
     });
     sendTemplate();
-  } catch (e) { 
+  } catch (e) {
   }
 }
 
@@ -179,12 +180,8 @@ function onBtnPreviewClickHandler() {
   <client-only>
     <div class="header">
       <div class="tabs">
-        <el-tabs
-          v-model="reportName"
-          type="card"
-          @tab-click="onBtnTabChangeClickHandler"
-        >
-          <el-tab-pane v-for="(item, index) in TemplateList" :key="index" :label="item.name" :name="item.nid"/>
+        <el-tabs v-model="reportName" type="card" @tab-click="onBtnTabChangeClickHandler">
+          <el-tab-pane v-for="(item, index) in TemplateList" :key="index" :label="item.name" :name="item.nid" />
         </el-tabs>
       </div>
       <div class="right-btn">
@@ -195,7 +192,7 @@ function onBtnPreviewClickHandler() {
     </div>
     <div class="main-flex">
       <div class="content-border">
-        <div v-for="(part, index) in elementsArr" :key="index" >
+        <div v-for="(part, index) in elementsArr" :key="index">
           <div>
             <div class="reoprt-element-text">
               <el-text>{{ part.value }}</el-text>
@@ -203,34 +200,23 @@ function onBtnPreviewClickHandler() {
           </div>
           <div v-for="(content, index) in part.headersArr" :key="index" class="section-border">
             <div v-for="(unit, indexs) in content" :key="indexs" class="content-format">
-              <div
-                class="background_gray_border left_box content-format-com"
-                horizontalAlign="left"
-              >
+              <div class="background_gray_border left_box content-format-com" horizontalAlign="left">
                 <el-text class="left_text">{{ `${unit.value}${index + 1}` }}</el-text>
               </div>
               <div class="content-format-com box-top-right">
                 <el-input v-if="unit.selectedType === 'input'" v-model="unit.inputValue" />
-                <el-input
-                  v-if="unit.selectedType === 'batchInput'"
-                  v-model="unit.inputValue"
-                  :autosize="{ minRows: 2, maxRows: 4 }"
-                  type="textarea"
-                />
+                <el-input v-if="unit.selectedType === 'batchInput'" v-model="unit.inputValue"
+                  :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" />
                 <el-select class="component-select" v-model="unit.selectedType" :disabled="unit.type.length === 1">
-                  <el-option
-                    class="options"
-                    v-for="item in unit.type"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                  />
+                  <el-option class="options" v-for="item in unit.type" :key="item" :label="item" :value="item" />
                 </el-select>
               </div>
-              <Button v-if="indexs === 0 && index > 0" class='delete-btn' :btnIcon="CloseBold" @click="onBtnDeleteLineClickHandler(part.headersArr, index)"></Button>
+              <Button v-if="indexs === 0 && index > 0" class='delete-btn' :btnIcon="CloseBold"
+                @click="onBtnDeleteLineClickHandler(part.headersArr, index)"></Button>
               <div v-else class='delete-btn-holder' />
             </div>
-            <Button v-if="index === (part.headersArr.length - 1)" class='add-types-btn' :btnIcon="Plus" @click="onBtnAddLineClickHandler(part.headersArr)"></Button>
+            <Button v-if="index === (part.headersArr.length - 1)" class='add-types-btn' :btnIcon="Plus"
+              @click="onBtnAddLineClickHandler(part.headersArr)"></Button>
           </div>
         </div>
       </div>
@@ -238,7 +224,7 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
       </div>
       <div class="preview-border">
-        <MarkDownTable :templeteAr="previewTemplate"/>
+        <MarkDownTable :templeteAr="previewTemplate" />
       </div>
     </div>
   </client-only>
@@ -332,7 +318,7 @@ function onBtnPreviewClickHandler() {
   margin-bottom: 1px;
 }
 
-.add-types-btn > span > i{
+.add-types-btn>span>i {
   margin-left: 0px;
 }
 
@@ -384,7 +370,7 @@ function onBtnPreviewClickHandler() {
   margin-bottom: 0px;
 }
 
-.delete-btn > span > i{
+.delete-btn>span>i {
   margin-left: 0px;
 }
 

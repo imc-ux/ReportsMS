@@ -10,10 +10,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 function templateTitle(info: any) {
     if (info && info.templateTitle) {
-        const tempArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
+        let tempArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
         let infos: any[] = [{ value: '区分', code0: '' }];
         for (let i = 0; i < tempArr.length; i++) {
-            const info: any = {};
+            let info: any = {};
             info.value = tempArr[i].value;
             info.code = 'code' + (i + 1);
             infos.push(info);
@@ -68,6 +68,7 @@ function templateTable(info: any) {
     } else {
         return [];
     }
+
 }
 </script>
 
