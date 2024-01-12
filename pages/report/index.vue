@@ -7,11 +7,12 @@ import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "~/vo
 import { CommonAlert } from '~/constant/alert/base';
 import { ShowAlert } from '~/components/alert';
 import type { TabsPaneContext } from 'element-plus'
-import { getTemplateList, createUserTemplate } from '~/api/templateApi';
+import { getTemplateList, createUserTemplate, sendTemplateMsg } from '~/api/templateApi';
 import { getUserTemplateList } from '~/api/messageApi';
 import { UserInfo } from "@/utils/Settings";
 
 const router = useRouter();
+const userId = ref<string>('');
 const templateTitle = ref<string>('');
 const templateElement = ref<string>('');
 const reportName = ref<number>(0);
@@ -40,7 +41,7 @@ const getLastReport = async () => {
   try {
     const info: TemplateHistory = {};
     info.content = '';
-    info.userId = UserInfo.userId;
+    info.userId = userId.value;
     info.templateId = reportName.value;
     info.iPageCount = 20;
     info.iStart = 0;
@@ -69,9 +70,9 @@ const getLastReport = async () => {
   }
 }
 
-const sendTemplate = async () => {
+const sendTemplate = async (nid: number) => {
   try {
-    const res: any = await createUserTemplate(createReport());
+    const res: any = await sendTemplateMsg(nid);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) })
@@ -80,7 +81,25 @@ const sendTemplate = async () => {
   }
 };
 
+const saveReport = async () => {
+  try {
+    const res: any = await createUserTemplate(createReport());
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      sendTemplate(result.data.nid)
+    }
+  } catch (error) {
+  }
+};
+
 onMounted(() => {
+  const urlString = new URL(window.location.href);
+  const urlUserId = urlString.searchParams.get('userId');
+  if (urlUserId) {
+    userId.value = urlUserId
+  } else {
+    userId.value = UserInfo.userId
+  }
   getTempList();
 })
 
@@ -99,7 +118,7 @@ function onBtnSendClickHandler() {
         }
       });
     });
-    sendTemplate();
+    saveReport();
   } catch (e) {
   }
 }
@@ -122,7 +141,7 @@ function onBtnDeleteLineClickHandler(arr: HeadersArrInfo[], index: number) {
 
 function createReport() {
   const info: TemplateHistory = {};
-  info.userId = 'kangjiaqi';
+  info.userId = userId.value;
   info.templateId = reportName.value;
   const sendContent: SendMsgInfo[] = [];
   elementsArr.forEach(data => {
@@ -296,7 +315,7 @@ function onBtnPreviewClickHandler() {
 }
 
 .content-border {
-  min-height: 900px;
+  min-height: 860px;
   width: 40%;
   border: 1px solid #cacaca;
   border-radius: 0;
