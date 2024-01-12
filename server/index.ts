@@ -2,8 +2,8 @@ import { UseFetchOptions, useFetch } from "nuxt/app";
 
 type Methods = "GET" | "POST";
 
-const SERVER_URL = "http://109.14.20.45:6636/ux/";
-//const SERVER_URL = "http://109.14.6.243:7777/";
+// const SERVER_URL = "http://109.14.20.45:6636/ux/";
+const SERVER_URL = "http://109.14.6.243:7777/";
 
 class HttpRequest {
   request(url: string, method: Methods, data: any) {
