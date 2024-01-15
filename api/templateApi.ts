@@ -21,10 +21,15 @@ const createUserTemplate = (params: any) => {
   return httpRequest.get(service.CreateUserTemplate, params);
 };
 
+const sendTemplateMsg = (params: any) => {
+  return httpRequest.get(service.SendTemplateMsg, params);
+};
+
 export {
   createTemplate,
   updateTemplate,
   getTemplateList,
   deleteTemplate,
   createUserTemplate,
+  sendTemplateMsg,
 };
