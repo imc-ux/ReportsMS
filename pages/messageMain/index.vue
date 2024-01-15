@@ -2,11 +2,11 @@
 import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute, useState } from 'nuxt/app';
-import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate } from '~/api/messageApi';
-import { TemplateHistory } from '~/vo';
-import { ShowAlert } from '~/components/alert';
-import { CommonAlert } from '~/constant/alert/base';
-import MarkDownTable from '~/components/MarkDownTable.vue';
+import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate } from '@/api/messageApi';
+import { TemplateHistory } from '@/vo';
+import { ShowAlert } from '@/components/alert';
+import { CommonAlert } from '@/constant/alert/base';
+import MarkDownTable from '@/components/MarkDownTable.vue';
 import { format } from "date-fns";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 
@@ -114,7 +114,6 @@ onMounted(() => {
     } else {
         count.value = 2;
     }
-    console.log(count.value);
     userList();
     templateList();
     setWaiting();
@@ -177,62 +176,62 @@ function onDeleteTemplateMessageHandler() {
 </script>
 <template>
     <client-only>
-        <div v-show="showIndex" style="width:100%;min-width: 1267px">
-            <div style="display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
-                <span style="font-size: x-large;">消息管理</span>
+        <div v-show="showIndex" class="box-top">
+            <div class="box-display">
+                <span class="font-size-large">消息管理</span>
             </div>
-            <div style="display: flex; height: 40px; border: 1px solid #cacaca;align-items: center;">
-                <div style="display: flex;width: 480px;">
-                    <div style="width:80px;margin-left: 5px;margin-top: 4px;">
+            <div class="box-display-item">
+                <div class="box-width">
+                    <div class="box-width-80">
                         <span>发送时间</span>
                     </div>
-                    <div style="width:380px;">
+                    <div class="box-width-380">
                         <el-date-picker v-model="dateValue" type="daterange" range-separator="~">
                         </el-date-picker>
                     </div>
                 </div>
-                <div style="display: flex;flex-grow: 1;">
-                    <div style="width:80px;margin-left: 5px;margin-top: 4px">
+                <div class="box-display-grow">
+                    <div class="box-width-80">
                         <span>模板类型</span>
                     </div>
-                    <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
+                    <div class="box-flex-margin">
                         <el-select v-model="selectedModel" placeholder="请选择" :clearable="clearable">
                             <el-option v-for="item in modelTypes" :key="item.nid" :label="item.name" :value="item.nid">
                             </el-option>
                         </el-select>
                     </div>
                 </div>
-                <div style="display: flex;flex-grow: 1;">
-                    <div style="width:64px;margin-left: 20px;margin-top: 4px">
+                <div class="box-display-grow">
+                    <div class="box-margin-width-64">
                         <span>发送人</span>
                     </div>
-                    <div style="margin-left: 5px;margin-right: 5px;flex-grow: 1;">
+                    <div class="box-flex-margin">
                         <el-select v-model="selectedUser" placeholder="请选择" :clearable="clearable">
                             <el-option v-for="item in userNames" :key="item.nid" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
                     </div>
                 </div>
-                <div style="display: flex;flex-grow: 1;">
-                    <div style="width:100px;margin-left: 20px;margin-top: 4px">
+                <div class="box-display-grow">
+                    <div class="box-margin-width-100">
                         <span>发送内容</span>
                     </div>
-                    <div class="main-input" style="margin-left: 5px;margin-right: 5px;">
+                    <div class="main-input margin-left-right">
                         <el-input v-model="inputMessage" placeholder="请输入内容"></el-input>
                     </div>
                 </div>
             </div>
-            <div style="display: flex;width: 100%">
-                <div style="justify-content: flex-start; display: flex; flex-grow: 1">
+            <div class="display-full-width">
+                <div class="justify-flex">
                     <Button class='btn-icon' @click="onNewMessageHandler">新增消息</Button>
                 </div>
-                <div style="justify-content: flex-end;display: flex;">
+                <div class="justify-flex-end">
                     <Button class='btn-icon' @click="onSearchHandlerClick">Search</Button>
                     <Button class='btn-icon' style="margin-left:5px;" @click="onResetHandlerClick">Reset</Button>
                 </div>
             </div>
             <div>
-                <el-table :data="tableData" border style="width: 100%" max-height="800px">
+                <el-table :data="tableData" border class="width-max" max-height="800">
                     <el-table-column header-align="center" align="center" prop="templateName" label="模板类型" />
                     <el-table-column header-align="center" align="center" prop="userName" label="发送人" />
                     <el-table-column header-align="center" align="center" prop="createTime" label="发送时间" />
@@ -250,11 +249,11 @@ function onDeleteTemplateMessageHandler() {
                 </el-pagination>
             </div>
         </div>
-        <div v-show="!showIndex" style="width:100%;min-width: 1267px">
-            <div style=" display: flex;margin-top: 5px;margin-bottom: 5px;width: 100%">
-                <span style="font-size: x-large;">消息管理详细</span>
+        <div v-show="!showIndex" class="width-min">
+            <div class="box-display">
+                <span class="font-size-large">消息管理详细</span>
             </div>
-            <div style="justify-content: flex-end;display: flex; padding-bottom: 5px;">
+            <div class="justify-flex-end_bottom">
                 <el-button type="primary" @click="onReturnClickHandler">返回</el-button>
                 <el-button type="primary" @click="onDeleteTemplateMessageHandler">删除</el-button>
             </div>
@@ -264,3 +263,102 @@ function onDeleteTemplateMessageHandler() {
         </div>
     </client-only>
 </template>
+
+<style>
+.justify-flex-end_bottom {
+    justify-content: flex-end;
+    display: flex;
+    padding-bottom: 5px;
+}
+
+.font-size-large {
+    font-size: x-large;
+}
+
+.box-top {
+    width: 100%;
+    min-width: 79.1875rem
+}
+
+.box-display {
+    display: flex;
+    margin-top: 0.3125rem;
+    margin-bottom: 0.3125rem;
+    width: 100%
+}
+
+.box-display-item {
+    display: flex;
+    height: 2.5rem;
+    border: 1px solid #cacaca;
+    align-items: center;
+}
+
+.box-width {
+    display: flex;
+    width: 30rem;
+}
+
+.box-width-80 {
+    width: 5rem;
+    margin-left: 0.3125rem;
+    margin-top: 0.25rem;
+}
+
+.box-width-380 {
+    width: 23.75rem;
+}
+
+.box-flex-margin {
+    margin-left: 0.3125rem;
+    margin-right: 0.3125rem;
+    flex-grow: 1;
+}
+
+.box-display-grow {
+    display: flex;
+    flex-grow: 1;
+}
+
+.box-margin-width-64 {
+    width: 4rem;
+    margin-left: 1.25rem;
+    margin-top: 0.25rem
+}
+
+.box-margin-width-100 {
+    width: 6.25rem;
+    margin-left: 1.25rem;
+    margin-top: 0.25rem
+}
+
+.margin-left-right {
+    margin-left: 0.3125rem;
+    margin-right: 0.3125rem;
+}
+
+.display-full-width {
+    display: flex;
+    width: 100%
+}
+
+.justify-flex {
+    justify-content: flex-start;
+    display: flex;
+    flex-grow: 1
+}
+
+.justify-flex-end {
+    justify-content: flex-end;
+    display: flex;
+}
+
+.width-max {
+    width: 100%;
+}
+
+.width-min {
+    width: 100%;
+    min-width: 1267px
+}
+</style>
