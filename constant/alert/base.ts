@@ -3,6 +3,7 @@ export enum CommonAlert {
   SAVE_DATA_SUCCESS = "保存成功!",
   DELETE_DATA_SUCCESS = "删除成功!",
   WHETHER_DELETE_TEMP = "是否删除模板?",
+  WHETHER_DELETE_MESSAGE = "是否删除此消息?",
   TITLE_EMPTY = "标题不能为空!",
   HEADER_EMPTY = "表头内容不能为空!",
   HEADER_COMPONENT_EMPTY = "表头控件不能为空!",
