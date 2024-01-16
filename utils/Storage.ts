@@ -1,6 +1,6 @@
 export default class Storage {
   static getSessionItem(key: string): string {
-    return window.sessionStorage.getItem(key) ?? '';
+    return window.sessionStorage.getItem(key) ?? "";
   }
 
   static setSessionItem(key: string, value?: string): void {
@@ -9,7 +9,7 @@ export default class Storage {
   }
 
   static getLocalItem(key: string): string {
-    return window.localStorage.getItem(key) ?? '';
+    return window.localStorage.getItem(key) ?? "";
   }
 
   static setLocalItem(key: string, value?: string): void {

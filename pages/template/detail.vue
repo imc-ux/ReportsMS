@@ -3,12 +3,12 @@ import { onMounted, ref, reactive } from 'vue';
 import { useRouter, useRoute } from 'nuxt/app';
 import { ElInput, ElText, ElSelect, ElOption } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
-import { TemplateInfo, ComponentlistInfo, SetContentInfo, TemplateHistory, HeadersArrInfo } from "~/vo";
-import { CommonAlert } from '~/constant/alert/base';
-import { ShowAlert } from '~/components/alert';
-import { createTemplate, updateTemplate } from '~/api/templateApi';
-import { getUserList } from '~/api/messageApi';
+import { TemplateInfo, ComponentlistInfo, SetContentInfo, TemplateHistory, HeadersArrInfo } from "@/vo";
+import { CommonAlert } from '@/constant/alert/base';
+import { ShowAlert } from '@/components/alert';
+import { createTemplate, updateTemplate } from '@/api/templateApi';
 import { UserInfo } from "@/utils/Settings";
+import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 
 const router = useRouter();
 const route = useRoute();
@@ -34,18 +34,6 @@ const inputLines = reactive<SetContentInfo[]>([
   { value: '', type: ['input'] }
 ]);
 
-const userList = async () => {
-  try {
-    const info: any = {};
-    info.blockflag = "N";
-    info.usertype = "U";
-    info.iStart = 0;
-    info.iPageCount = 20;
-    await getUserList(info);
-  } catch (error) {
-  }
-};
-
 const createSaveTemplate = async () => {
   try {
     const info: TemplateInfo = {};
@@ -53,9 +41,11 @@ const createSaveTemplate = async () => {
     info.title = transform(combinations);
     info.element = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
     info.creator = UserInfo.userId;
+    setWaiting();
     const res: any = await createTemplate(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
+      removeWaiting();
       ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => onBtnBackClickHandler())
     }
   } catch (error) {
@@ -70,9 +60,11 @@ const editSaveTemplate = async () => {
     info.title = transform(combinations);
     info.element = transform([{ value: verticalColumn.value, type: ['input'] }, ...inputLines]);
     info.changer = UserInfo.userId;
+    setWaiting();
     const res: any = await updateTemplate(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
+      removeWaiting();
       ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => onBtnBackClickHandler())
     }
   } catch (error) {
@@ -239,36 +231,36 @@ function onBtnPreviewClickHandler() {
 
 <style>
 .split-line {
-  border-bottom: 1px solid #cacaca;
+  border-bottom: 0.0625rem solid #cacaca;
 }
 
 .non-init-button {
-  margin-left: 3px;
+  margin-left: 0.1875rem;
 }
 
 .content-border {
-  height: 860px;
+  height: 53.75rem;
   width: 40%;
-  border: 1px solid #cacaca;
+  border: 0.0625rem solid #cacaca;
   border-radius: 0;
-  margin-top: 20px;
+  margin-top: 1.25rem;
   display: inline-block;
 }
 
 .title {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .title-text {
   color: #000;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
     "微软雅黑";
-  margin: 10px;
-  width: 40px;
-  height: 30px;
-  line-height: 30px;
+  margin: 0.625rem;
+  width: 2.5rem;
+  height: 1.875rem;
+  line-height: 1.875rem;
   display: inline-block;
 }
 
@@ -279,59 +271,59 @@ function onBtnPreviewClickHandler() {
 
 .settled-input {
   width: 47%;
-  margin-right: 20px;
+  margin-right: 1.25rem;
   display: inline-block;
 }
 
 .changeable-input {
   width: 85%;
-  margin-right: 20px;
+  margin-right: 1.25rem;
   display: inline-block;
 }
 
 .settled-input-height {
-  height: 32px;
+  height: 2rem;
 }
 
 .text-empty-margin {
-  margin-left: 60px;
-  height: 32px;
+  margin-left: 3.75rem;
+  height: 2rem;
   display: flex;
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 
 .text-with-select {
-  margin-left: 60px;
-  height: 40px;
+  margin-left: 3.75rem;
+  height: 2.5rem;
 }
 
 .component-multiple-select {
   display: inline-block;
   width: 65%;
-  margin-left: 20px;
-  min-width: 220px;
+  margin-left: 1.25rem;
+  min-width: 13.75rem;
 }
 
 .add-types-btn {
-  width: 30px;
-  height: 30px;
-  margin-left: 60px;
-  margin-bottom: 10px;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin-left: 3.75rem;
+  margin-bottom: 0.625rem;
 }
 
 .add-types-btn:hover {
-  width: 30px;
-  height: 30px;
-  margin-left: 60px;
-  margin-bottom: 10px;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin-left: 3.75rem;
+  margin-bottom: 0.625rem;
 }
 
 .add-types-btn>span>i {
-  margin-left: 0px;
+  margin-left: 0rem;
 }
 
 .gauge-outfit {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .transform-btn-location {
@@ -345,33 +337,33 @@ function onBtnPreviewClickHandler() {
 }
 
 .preview-border {
-  height: 900px;
+  height: 53.75rem;
   width: 40%;
-  border: 1px solid #cacaca;
+  border: 0.0625rem solid #cacaca;
   border-radius: 0;
-  margin-top: 20px;
+  margin-top: 1.25rem;
   display: inline-block;
 }
 
 .delete-btn {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-left: 10px;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0rem;
+  margin-left: 0.625rem;
 }
 
 .delete-btn:hover {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
-  margin-left: 10px;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0rem;
+  margin-left: 0.625rem;
 }
 
 .delete-btn>span>i {
-  margin-left: 0px;
+  margin-left: 0rem;
 }
 
 .delete-btn-holder {
-  width: 77px;
+  width: 4.8125rem;
 }
 </style>

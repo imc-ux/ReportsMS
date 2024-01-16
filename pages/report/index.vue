@@ -3,13 +3,15 @@ import { onMounted, ref, reactive } from 'vue';
 import { useRouter } from 'nuxt/app';
 import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
-import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "~/vo";
-import { CommonAlert } from '~/constant/alert/base';
-import { ShowAlert } from '~/components/alert';
+import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "@/vo";
+import { CommonAlert } from '@/constant/alert/base';
+import { ShowAlert } from '@/components/alert';
 import type { TabsPaneContext } from 'element-plus'
 import { getTemplateList, createUserTemplate, sendTemplateMsg } from '~/api/templateApi';
-import { getUserTemplateList } from '~/api/messageApi';
+import { getUserTemplateList } from '@/api/messageApi';
 import { UserInfo } from "@/utils/Settings";
+import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
+import { setSessionUserInfo } from '@/utils/Storage';
 
 const router = useRouter();
 const userId = ref<string>('');
@@ -72,9 +74,11 @@ const getLastReport = async () => {
 
 const sendTemplate = async (nid: number) => {
   try {
+    setWaiting();
     const res: any = await sendTemplateMsg(nid);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
+      removeWaiting();
       ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) })
     }
   } catch (error) {
@@ -83,9 +87,11 @@ const sendTemplate = async (nid: number) => {
 
 const saveReport = async () => {
   try {
+    setWaiting();
     const res: any = await createUserTemplate(createReport());
     let result = JSON.parse(res.data.value);
     if (!result.error) {
+      removeWaiting();
       sendTemplate(result.data.nid)
     }
   } catch (error) {
@@ -94,9 +100,11 @@ const saveReport = async () => {
 
 onMounted(() => {
   const urlString = new URL(window.location.href);
-  const urlUserId = urlString.searchParams.get('userId');
-  if (urlUserId) {
-    userId.value = urlUserId
+  const userSession: any = {};
+  userSession.id = urlString.searchParams.get('userId');
+  if (userSession.id) {
+    userId.value = userSession.id
+    setSessionUserInfo(userSession);
   } else {
     userId.value = UserInfo.userId
   }
@@ -252,7 +260,7 @@ function onBtnPreviewClickHandler() {
 <style>
 .header {
   display: flex;
-  height: 20px;
+  height: 1.25rem;
   position: relative;
 }
 
@@ -267,46 +275,46 @@ function onBtnPreviewClickHandler() {
 }
 
 .section-border {
-  border: 1px solid #cacaca;
-  margin: 0 5px 3px;
+  border: 0.0625rem solid #cacaca;
+  margin: 0 0.3125rem 0.1875rem;
 }
 
 .content-format {
   display: flex;
-  margin: 1px;
+  margin: 0.0625rem;
 }
 
 .content-format-com {
   display: flex;
-  line-height: 28px;
+  line-height: 1.75rem;
 }
 
 .background_gray_border {
   color: #fff;
-  border-top: 1px solid #cacaca;
-  border-bottom: 1px solid #cacaca;
+  border-top: 0.0625rem solid #cacaca;
+  border-bottom: 0.0625rem solid #cacaca;
   border-collapse: collapse;
   text-align: center;
 }
 
 .left_box {
-  width: 120px;
+  width: 7.5rem;
   justify-content: center;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 0.8125rem;
   background-color: #08ADAA;
 }
 
 .left_text {
   width: 100%;
-  padding-left: 10px;
+  padding-left: 0.625rem;
   text-align: left;
   color: #fff;
 }
 
 .box-top-right {
   width: 100%;
-  margin-right: 3px;
+  margin-right: 0.1875rem;
 }
 
 .input-margin {
@@ -315,30 +323,30 @@ function onBtnPreviewClickHandler() {
 }
 
 .content-border {
-  min-height: 860px;
+  min-height: 53.75rem;
   width: 40%;
-  border: 1px solid #cacaca;
+  border: 0.0625rem solid #cacaca;
   border-radius: 0;
-  margin-top: 20px;
+  margin-top: 1.25rem;
   display: inline-block;
 }
 
 .add-types-btn {
-  width: 30px;
-  height: 30px;
-  margin-left: 1px;
-  margin-bottom: 1px;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin-left: 0.0625rem;
+  margin-bottom: 0.0625rem;
 }
 
 .add-types-btn:hover {
-  width: 30px;
-  height: 30px;
-  margin-left: 1px;
-  margin-bottom: 1px;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin-left: 0.0625rem;
+  margin-bottom: 0.0625rem;
 }
 
 .add-types-btn>span>i {
-  margin-left: 0px;
+  margin-left: 0rem;
 }
 
 .transform-btn-location {
@@ -352,55 +360,55 @@ function onBtnPreviewClickHandler() {
 }
 
 .preview-border {
-  height: 900px;
+  height: 53.75rem;
   width: 40%;
-  border: 1px solid #cacaca;
+  border: 0.0625rem solid #cacaca;
   border-radius: 0;
-  margin-top: 20px;
+  margin-top: 1.25rem;
   display: inline-block;
 }
 
 .reoprt-element-text {
   color: #000;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
     "微软雅黑";
-  margin: 10px;
+  margin: 0.625rem;
   width: 100%;
-  height: 30px;
-  line-height: 30px;
+  height: 1.875rem;
+  line-height: 1.875rem;
   display: inline-block;
 }
 
 .delete-btn {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0rem;
   margin-left: auto;
-  margin-bottom: 0px;
+  margin-bottom: 0rem;
 }
 
 .delete-btn:hover {
-  width: 32px;
-  height: 32px;
-  margin-top: 0px;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0rem;
   margin-left: auto;
-  margin-bottom: 0px;
+  margin-bottom: 0rem;
 }
 
 .delete-btn>span>i {
-  margin-left: 0px;
+  margin-left: 0rem;
 }
 
 .delete-btn-holder {
-  width: 40px;
+  width: 2.5rem;
 }
 
 .component-select {
   display: inline-block;
-  width: 120px;
-  margin-left: 3px;
-  min-width: 120px;
+  width: 7.5rem;
+  margin-left: 0.1875rem;
+  min-width: 7.5rem;
 }
 </style>
