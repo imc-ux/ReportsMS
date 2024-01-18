@@ -227,7 +227,7 @@ function onDeleteTemplateMessageHandler() {
                 </div>
                 <div class="justify-flex-end">
                     <Button class='btn-icon' @click="onSearchHandlerClick">Search</Button>
-                    <Button class='btn-icon' style="margin-left:5px;" @click="onResetHandlerClick">Reset</Button>
+                    <Button class='btn-icon marginLeft' @click="onResetHandlerClick">Reset</Button>
                 </div>
             </div>
             <div>
@@ -268,7 +268,7 @@ function onDeleteTemplateMessageHandler() {
 .justify-flex-end_bottom {
     justify-content: flex-end;
     display: flex;
-    padding-bottom: 5px;
+    padding-bottom: 0.3125rem;
 }
 
 .font-size-large {
@@ -290,7 +290,7 @@ function onDeleteTemplateMessageHandler() {
 .box-display-item {
     display: flex;
     height: 2.5rem;
-    border: 1px solid #cacaca;
+    border: 0.0625rem solid #cacaca;
     align-items: center;
 }
 
@@ -359,6 +359,10 @@ function onDeleteTemplateMessageHandler() {
 
 .width-min {
     width: 100%;
-    min-width: 1267px
+    min-width: 79.1875rem;
+}
+
+.marginLeft {
+    margin-left: 0.3125rem;
 }
 </style>
