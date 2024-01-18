@@ -3,10 +3,11 @@ import { onMounted, ref, reactive } from 'vue';
 import { useRouter } from 'nuxt/app';
 import { ElInput, ElText, ElTable, ElTableColumn, ElButton } from 'element-plus';
 import { Search } from "@element-plus/icons-vue";
-import { TemplateInfo } from "~/vo";
-import { CommonAlert } from '~/constant/alert/base';
-import { ShowAlert } from '~/components/alert';
-import { getTemplateList, deleteTemplate } from '~/api/templateApi';
+import { TemplateInfo } from "@/vo";
+import { CommonAlert } from '@/constant/alert/base';
+import { ShowAlert } from '@/components/alert';
+import { getTemplateList, deleteTemplate } from '@/api/templateApi';
+import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 
 const router = useRouter();
 const title = ref<string>('');
@@ -17,6 +18,7 @@ const getTempList = async () => {
   try {
     const info: TemplateInfo = {};
     info.name = title.value;
+    setWaiting();
     const res: any = await getTemplateList(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
@@ -24,6 +26,7 @@ const getTempList = async () => {
       result.data.forEach((element: any, index: number) => {
         element.key = index + 1;
       })
+      removeWaiting();
       templateData.push(...result.data);
     }
   } catch (error) {
@@ -34,9 +37,11 @@ const deleteTempList = async () => {
   try {
     const info: TemplateInfo = {};
     info.nid = deleteId.value;
+    setWaiting();
     const res: any = await deleteTemplate(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
+      removeWaiting();
       ShowAlert(CommonAlert.DELETE_DATA_SUCCESS, 0, () => onBtnSearchClickHandler())
     }
   } catch (error) {
@@ -106,8 +111,8 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 <style>
   .page-name {
     display: flex;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 0.3125rem;
+    margin-bottom: 0.3125rem;
     width: 100%;
   }
 
@@ -117,13 +122,13 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 
   .main-title-text {
     color: #000;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
-    margin-left: 10px;
-    width: 40px;
-    height: 30px;
-    line-height: 30px;
+    margin-left: 0.625rem;
+    width: 2.5rem;
+    height: 1.875rem;
+    line-height: 1.875rem;
     display: inline-block;
   }
 
@@ -138,28 +143,28 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 
   .search-condition {
     display: flex; 
-    height: 40px; 
-    border: 1px solid #cacaca; 
-    padding-top: 10px;
+    height: 2.5rem; 
+    border: 0.0625rem solid #cacaca; 
+    padding-top: 0.625rem;
   }
 
   .search-btn {
-    width: 32px;
-    height: 32px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    margin-left: 10px;
+    width: 2rem;
+    height: 2rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    margin-left: 0.625rem;
   }
 
   .search-btn:hover {
-    width: 32px;
-    height: 32px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    margin-left: 10px;
+    width: 2rem;
+    height: 2rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    margin-left: 0.625rem;
   }
 
   .search-btn>span>i {
-    margin-left: 0px;
+    margin-left: 0rem;
   }
 </style>
