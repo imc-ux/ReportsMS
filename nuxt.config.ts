@@ -38,6 +38,11 @@ export default {
             component: resolve(__dirname, "pages/report/"),
           },
           {
+            path: "/messageStatistics",
+            name: "messageStatistics",
+            component: resolve(__dirname, "pages/messageStatistics/"),
+          },
+          {
             path: "",
             name: "messageMain",
             component: resolve(__dirname, "pages/messageMain/"),
