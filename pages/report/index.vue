@@ -14,7 +14,6 @@ import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 import { setSessionUserInfo } from '@/utils/Storage';
 
 const router = useRouter();
-const userId = ref<string>('');
 const templateTitle = ref<string>('');
 const templateElement = ref<string>('');
 const reportName = ref<number>(0);
@@ -43,7 +42,7 @@ const getLastReport = async () => {
   try {
     const info: TemplateHistory = {};
     info.content = '';
-    info.userId = userId.value;
+    info.userId = UserInfo.userId;
     info.templateId = reportName.value;
     info.iPageCount = 20;
     info.iStart = 0;
@@ -103,10 +102,7 @@ onMounted(() => {
   const userSession: any = {};
   userSession.id = urlString.searchParams.get('userId');
   if (userSession.id) {
-    userId.value = userSession.id
     setSessionUserInfo(userSession);
-  } else {
-    userId.value = UserInfo.userId
   }
   getTempList();
 })
@@ -149,7 +145,7 @@ function onBtnDeleteLineClickHandler(arr: HeadersArrInfo[], index: number) {
 
 function createReport() {
   const info: TemplateHistory = {};
-  info.userId = userId.value;
+  info.userId = UserInfo.userId;
   info.templateId = reportName.value;
   const sendContent: SendMsgInfo[] = [];
   elementsArr.forEach(data => {
@@ -213,8 +209,8 @@ function onBtnPreviewClickHandler() {
       </div>
       <div class="right-btn">
         <Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button>
-        <Button class='btn-icon' @click="onBtnFillUpClickHandler">填充上次消息</Button>
-        <Button class='btn-icon' @click="onBtnSendClickHandler">发送</Button>
+        <!-- <Button class='btn-icon' @click="onBtnFillUpClickHandler">填充上次消息</Button> -->
+        <!-- <Button class='btn-icon' @click="onBtnSendClickHandler">发送</Button> -->
       </div>
     </div>
     <div class="main-flex">
@@ -248,7 +244,15 @@ function onBtnPreviewClickHandler() {
         </div>
       </div>
       <div class='transform-btn-location'>
-        <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
+        <div>
+          <Button class='btn-icon operate-btn' @click="onBtnFillUpClickHandler">填充上次消息</Button>
+        </div>
+        <div>
+          <Button class='btn-icon operate-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
+        </div>
+        <div>
+          <Button class='btn-icon operate-btn' @click="onBtnSendClickHandler">发送</Button>
+        </div>
       </div>
       <div class="preview-border">
         <MarkDownTable :templeteAr="previewTemplate" />
@@ -351,7 +355,7 @@ function onBtnPreviewClickHandler() {
 
 .transform-btn-location {
   width: 20%;
-  margin: auto;
+  margin-top: 1.25rem;
 }
 
 .transform-btn {
@@ -410,5 +414,14 @@ function onBtnPreviewClickHandler() {
   width: 7.5rem;
   margin-left: 0.1875rem;
   min-width: 7.5rem;
+}
+
+.operate-btn {
+  margin:0rem auto 0.5rem auto;
+  display: block;
+}
+
+.operate-btn:hover {
+  margin:0rem auto 0.5rem auto;
 }
 </style>

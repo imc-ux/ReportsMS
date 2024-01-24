@@ -53,7 +53,7 @@ onMounted(() => {
 })
 
 function onBtnSearchClickHandler() {
-  getTempList()
+  getTempList();
 }
 
 function onBtnAddClickHandler() {
