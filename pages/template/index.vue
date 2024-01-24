@@ -92,7 +92,7 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
       </div>
     </div>
     <div>
-      <el-table :data="templateData" style="width: 100%" border>
+      <el-table :data="templateData" class="width-max" border>
         <el-table-column header-align="center" align="center" prop="key" label="序号" min-width="50" />
         <el-table-column header-align="center" align="center" prop="name" label="模板标题" min-width="200" />
         <el-table-column header-align="center" align="center" prop="creatorName" label="创建者" min-width="100" />
@@ -109,62 +109,66 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 </template>
 
 <style>
-  .page-name {
-    display: flex;
-    margin-top: 0.3125rem;
-    margin-bottom: 0.3125rem;
-    width: 100%;
-  }
+.width-max {
+  width: 100%;
+}
 
-  .page-name>span {
-    font-size: x-large;
-  }
+.page-name {
+  display: flex;
+  margin-top: 0.3125rem;
+  margin-bottom: 0.3125rem;
+  width: 100%;
+}
 
-  .main-title-text {
-    color: #000;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
-    margin-left: 0.625rem;
-    width: 2.5rem;
-    height: 1.875rem;
-    line-height: 1.875rem;
-    display: inline-block;
-  }
+.page-name>span {
+  font-size: x-large;
+}
 
-  .main-search-input {
-    display: inline-block;
-    width: 20%;
-  }
+.main-title-text {
+  color: #000;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
+  margin-left: 0.625rem;
+  width: 2.5rem;
+  height: 1.875rem;
+  line-height: 1.875rem;
+  display: inline-block;
+}
 
-  .right-btn {
-    display: inline-block;
-  }
+.main-search-input {
+  display: inline-block;
+  width: 20%;
+}
 
-  .search-condition {
-    display: flex; 
-    height: 2.5rem; 
-    border: 0.0625rem solid #cacaca; 
-    padding-top: 0.625rem;
-  }
+.right-btn {
+  display: inline-block;
+}
 
-  .search-btn {
-    width: 2rem;
-    height: 2rem;
-    margin-top: 0rem;
-    margin-bottom: 0rem;
-    margin-left: 0.625rem;
-  }
+.search-condition {
+  display: flex;
+  height: 2.5rem;
+  border: 0.0625rem solid #cacaca;
+  padding-top: 0.625rem;
+}
 
-  .search-btn:hover {
-    width: 2rem;
-    height: 2rem;
-    margin-top: 0rem;
-    margin-bottom: 0rem;
-    margin-left: 0.625rem;
-  }
+.search-btn {
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  margin-left: 0.625rem;
+}
 
-  .search-btn>span>i {
-    margin-left: 0rem;
-  }
+.search-btn:hover {
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  margin-left: 0.625rem;
+}
+
+.search-btn>span>i {
+  margin-left: 0rem;
+}
 </style>
