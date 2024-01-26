@@ -13,8 +13,13 @@ class HttpRequest {
         method: method,
       };
       if (method === "GET") {
-        let jsonString: any = encodeURIComponent(JSON.stringify(data));
-        newOptions.params = { jsonString };
+        if (typeof data === "string") {
+          let jsonString: any = data
+          newOptions.params = { jsonString };
+        } else {
+          let jsonString: any = encodeURIComponent(JSON.stringify(data));
+          newOptions.params = { jsonString };
+        }
       }
       if (method === "POST") {
         newOptions.body = data;

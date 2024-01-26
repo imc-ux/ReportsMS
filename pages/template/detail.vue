@@ -6,7 +6,7 @@ import { Plus, CloseBold } from "@element-plus/icons-vue";
 import { TemplateInfo, ComponentlistInfo, SetContentInfo, TemplateHistory, HeadersArrInfo } from "@/vo";
 import { CommonAlert } from '@/constant/alert/base';
 import { ShowAlert } from '@/components/alert';
-import { createTemplate, updateTemplate } from '@/api/templateApi';
+import { createTemplate, updateTemplate, getUserActivePermission } from '@/api/templateApi';
 import { UserInfo } from "@/utils/Settings";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 
@@ -17,6 +17,7 @@ const distinguish = ref<string>('区分');
 const verticalColumn = ref<string>('');
 const editType = ref<boolean>(false);
 const previewTemplate = ref<TemplateHistory>({});
+const userPermission = ref<string>('');
 const components = reactive<ComponentlistInfo[]>([{
   value: 'input',
   label: 'input',
@@ -33,6 +34,19 @@ const inputLines = reactive<SetContentInfo[]>([
   { value: '', type: ['input'] },
   { value: '', type: ['input'] }
 ]);
+
+const getUserPermission = async () => {
+  try {
+    const userId = UserInfo.userId;
+    const res: any = await getUserActivePermission(userId);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      userPermission.value = result.data;
+    }
+  } catch (error) {
+
+  }
+}
 
 const createSaveTemplate = async () => {
   try {
@@ -72,6 +86,7 @@ const editSaveTemplate = async () => {
 };
 
 onMounted(() => {
+  getUserPermission();
   if (!route.query.name) {
     return;
   } else {
@@ -165,7 +180,8 @@ function onBtnPreviewClickHandler() {
   <client-only>
     <div class="split-line">
       <Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button>
-      <Button class='btn-icon non-init-button' @click="onBtnSaveClickHandler">保存</Button>
+      <Button v-show="userPermission.indexOf('T_A') >= 0" class='btn-icon non-init-button'
+        @click="onBtnSaveClickHandler">保存</Button>
     </div>
     <div class="main-flex">
       <div class="content-border">

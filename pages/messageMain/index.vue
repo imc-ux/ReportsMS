@@ -2,12 +2,13 @@
 import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute, useState } from 'nuxt/app';
-import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate } from '@/api/messageApi';
+import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate, getUserActivePermission } from '@/api/messageApi';
 import { TemplateHistory } from '@/vo';
 import { ShowAlert } from '@/components/alert';
 import { CommonAlert } from '@/constant/alert/base';
 import MarkDownTable from '@/components/MarkDownTable.vue';
-import { format } from "date-fns";
+import { format, subWeeks } from "date-fns";
+import { UserInfo } from "@/utils/Settings";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 
 const router = useRouter();
@@ -27,6 +28,26 @@ const totalCount = useState<number>('totalCount', () => 0);
 const templateData = useState<any>('templateData', () => { });
 const showIndex = useState<any>('showIndex', () => true);
 const count = useState<number>('count', () => 0);
+const userPermission = useState<string>('userPermission', () => '');
+
+const getUserPermission = async () => {
+    try {
+        const userId = UserInfo.userId;
+        const res: any = await getUserActivePermission(userId);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            overCount();
+            userPermission.value = result.data;
+            if (userPermission.value.indexOf('T_B') >= 0) {
+                dateValue.value = [new Date(), new Date()];
+            } else {
+                dateValue.value = [subWeeks(new Date(), 1), new Date()];
+            }
+        }
+    } catch (error) {
+
+    }
+}
 
 const userList = async () => {
     try {
@@ -68,7 +89,11 @@ const searchInfo = async () => {
             info.dateTo = format(dateValue.value[1], "yyyy-MM-dd");
         }
         info.content = inputMessage.value;
-        info.userId = selectedUser.value;
+        if (userPermission.value.indexOf('T_B') >= 0) {
+            info.userId = selectedUser.value;
+        } else {
+            info.userId = UserInfo.userId;
+        }
         if (selectedModel.value) {
             info.templateId = (Number)(selectedModel.value);
         }
@@ -108,14 +133,15 @@ const deleteTemplate = async () => {
 
 onMounted(() => {
     if (route.query?.type === 'search') {
-        count.value = 3;
+        count.value = 4;
         iPage.value = 1;
         searchInfo();;
     } else {
-        count.value = 2;
+        count.value = 3;
     }
     userList();
     templateList();
+    getUserPermission();
     setWaiting();
 });
 
@@ -139,7 +165,11 @@ function onSearchHandlerClick() {
 }
 
 function onResetHandlerClick() {
-    dateValue.value = ''
+    if (userPermission.value.indexOf('T_B') >= 0) {
+        dateValue.value = [new Date(), new Date()];
+    } else {
+        dateValue.value = [subWeeks(new Date(), 1), new Date()];
+    }
     selectedModel.value = '';
     selectedUser.value = ''
     inputMessage.value = '';
@@ -201,7 +231,7 @@ function onDeleteTemplateMessageHandler() {
                         </el-select>
                     </div>
                 </div>
-                <div class="box-display-grow">
+                <div v-show="userPermission.indexOf('T_B') >= 0" class="box-display-grow">
                     <div class="box-margin-width-64">
                         <span>发送人</span>
                     </div>
