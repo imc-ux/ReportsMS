@@ -12,15 +12,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 function templateTable(info: any) {
     if (info && info.templateTitle) {
-        let text: string = '| <div style="min-width: 100px;">区分</div>';
+        let text: string = '| <div class="min-width-100">区分</div>';
         const templateTitleArr = JSON.parse(JSON.parse(JSON.stringify(info.templateTitle)));
         const elementArr = JSON.parse(JSON.parse(JSON.stringify(info.templateElement)));
         const contentArr = JSON.parse(JSON.parse(JSON.stringify(info.content)));
         templateTitleArr.forEach((data: any, index: number) => {
             if (index === 0) {
-                text += '|<div style="min-width: 120px;">' + data.value + '</div> ';
+                text += '|<div class="min-width-120">' + data.value + '</div> ';
             } else {
-                text += '|<div style="min-width: 480px;">' + data.value + '</div> ';
+                text += '|<div class="min-width-480">' + data.value + '</div> ';
             }
         });
         text += '| \n | :---:';
@@ -65,7 +65,7 @@ function templateTable(info: any) {
 <style>
 .default-theme table tr th,
 .default-theme table tr td {
-    border: 1px solid #c8c9cc
+    border: 0.0625rem solid #c8c9cc;
 }
 
 .default-theme table tr th {
@@ -74,5 +74,17 @@ function templateTable(info: any) {
 
 .default-theme table tr td:first-child {
     background-color: rgb(218, 238, 243);
+}
+
+.min-width-100 {
+    min-width: 6.25rem;
+}
+
+.min-width-120 {
+    min-width: 7.5rem;
+}
+
+.min-width-480 {
+    min-width: 30rem;
 }
 </style>
