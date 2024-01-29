@@ -85,6 +85,6 @@ function templateTable(info: any) {
 }
 
 .min-width-480 {
-    min-width: 30rem;
+    min-width: 29.375rem;
 }
 </style>
