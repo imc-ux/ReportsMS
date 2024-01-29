@@ -34,7 +34,7 @@
 }
 .el-table {
   --el-table-border-color: #e6e6e6;
-  --el-table-border: 1px solid #e6e6e6;
+  --el-table-border: 0.0625rem solid #e6e6e6;
   --el-table-text-color: #161616;
   --el-table-header-text-color: #fff;
   --el-table-row-hover-bg-color: var(--el-fill-color-light);
@@ -147,7 +147,7 @@
   --el-input-border: var(--el-border);
   --el-input-hover-border: var(--el-border-color-hover);
   --el-input-focus-border: #08adaa;
-  --el-input-transparent-border: 0 0 0 1px transparent inset;
+  --el-input-transparent-border: 0 0 0 0.0625rem transparent inset;
   --el-input-border-color: var(--el-border-color);
   --el-input-border-radius: var(--el-border-radius-base);
   --el-input-bg-color: var(--el-fill-color-blank);

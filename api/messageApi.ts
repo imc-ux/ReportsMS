@@ -17,4 +17,8 @@ const deleteUserTemplate = (params: any) => {
   return httpRequest.get(service.DeleteUserTemplate, params);
 }
 
-export { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate };
+const getUserActivePermission = (params: any) => {
+  return httpRequest.get(service.GetUserActivePermission, params);
+}
+
+export { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate, getUserActivePermission };

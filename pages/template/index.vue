@@ -6,13 +6,28 @@ import { Search } from "@element-plus/icons-vue";
 import { TemplateInfo } from "@/vo";
 import { CommonAlert } from '@/constant/alert/base';
 import { ShowAlert } from '@/components/alert';
-import { getTemplateList, deleteTemplate } from '@/api/templateApi';
+import { getTemplateList, deleteTemplate, getUserActivePermission } from '@/api/templateApi';
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
+import { UserInfo } from "@/utils/Settings";
 
 const router = useRouter();
 const title = ref<string>('');
 const deleteId = ref<number>(0);
 const templateData = reactive<TemplateInfo[]>([]);
+const userPermission = ref<string>('');
+
+const getUserPermission = async () => {
+  try {
+    const userId = UserInfo.userId;
+    const res: any = await getUserActivePermission(userId);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      userPermission.value = result.data;
+    }
+  } catch (error) {
+
+  }
+}
 
 const getTempList = async () => {
   try {
@@ -50,6 +65,7 @@ const deleteTempList = async () => {
 
 onMounted(() => {
   getTempList();
+  getUserPermission();
 })
 
 function onBtnSearchClickHandler() {
@@ -88,7 +104,7 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
     </div>
     <div class="split-line-top">
       <div class="right-btn">
-        <Button class='btn-icon' @click="onBtnAddClickHandler">创建模板</Button>
+        <Button v-show="userPermission.indexOf('T_A') >= 0" class='btn-icon' @click="onBtnAddClickHandler">创建模板</Button>
       </div>
     </div>
     <div>
@@ -99,8 +115,12 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
         <el-table-column header-align="center" align="center" prop="createTime" label="创建时间" min-width="120" />
         <el-table-column header-align="center" align="center" label="操作" min-width="120">
           <template #default="scope">
-            <el-button link type="primary" @click="onBtnEditClickHandler(scope.row)">编辑</el-button>
-            <el-button link type="primary" @click="onBtnDeleteClickHandler(scope.row)">删除</el-button>
+            <el-button v-show="userPermission.indexOf('T_A') < 0" link type="primary"
+              @click="onBtnEditClickHandler(scope.row)">查看</el-button>
+            <el-button v-show="userPermission.indexOf('T_A') >= 0" link type="primary"
+              @click="onBtnEditClickHandler(scope.row)">编辑</el-button>
+            <el-button v-show="userPermission.indexOf('T_A') >= 0" link type="primary"
+              @click="onBtnDeleteClickHandler(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

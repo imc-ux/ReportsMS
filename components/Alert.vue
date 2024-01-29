@@ -40,20 +40,20 @@ export default {
 </script>
 
 <template>
-    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="315px" draggable
+    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="19.6875rem" draggable
         align-center>
         <div class="alert-content">
             <div v-if="icon === 0" class="icon-box">
-                <el-image style="width: 40px; height: 40px" :src="icon_succeed" :fit="'fill'" />
+                <el-image class="image-width-style" :src="icon_succeed" :fit="'fill'" />
             </div>
             <div v-else-if="icon === 1" class="icon-box">
-                <el-image style="width: 40px; height: 40px" :src="icon_warning" :fit="'fill'" />
+                <el-image class="image-width-style" :src="icon_warning" :fit="'fill'" />
             </div>
             <div v-else-if="icon === 2" class="icon-box">
-                <el-image style="width: 40px; height: 40px" :src="icon_question" :fit="'fill'" />
+                <el-image class="image-width-style" :src="icon_question" :fit="'fill'" />
             </div>
             <div v-else="icon === 3" class="icon-box">
-                <el-image style="width: 40px; height: 40px" :src="icon_delete" :fit="'fill'" />
+                <el-image class="image-width-style" :src="icon_delete" :fit="'fill'" />
             </div>
             <span class="alert-message">{{ props.message }}</span>
         </div>
@@ -73,34 +73,39 @@ export default {
 
 
 <style>
+.image-width-style {
+    width: 2.5rem;
+    height: 2.5rem
+}
+
 .el-dialog__header {
-    height: 28px;
+    height: 1.75rem;
     background-color: #08adaa;
-    padding: 0px;
-    margin: 0px;
+    padding: 0rem;
+    margin: 0rem;
 }
 
 .alert-button {
-    width: 66px;
-    height: 24px;
-    font-size: 13px;
+    width: 4.125rem;
+    height: 1.5rem;
+    font-size: 0.8125rem;
     margin: auto;
     background-color: #08adaa;
     color: #fff;
 }
 
 .alert-button:hover {
-    width: 66px;
-    height: 24px;
-    font-size: 13px;
+    width: 4.125rem;
+    height: 1.5rem;
+    font-size: 0.8125rem;
     margin: auto;
     background-color: #08adaa;
     color: #fff;
 }
 
 .el-dialog__footer {
-    height: 40px;
-    padding: 0px;
+    height: 2.5rem;
+    padding: 0rem;
     margin: auto;
     text-align: center;
 }
@@ -108,28 +113,28 @@ export default {
 .alert-content {
     display: flex;
     align-items: center;
-    min-height: 70px;
+    min-height: 4.375rem;
     width: auto;
-    padding: 0px 15px;
+    padding: 0rem 0.9375rem;
 }
 
 .alert-message {
-    margin-left: 20px;
-    font-size: 14px;
+    margin-left: 1.25rem;
+    font-size: 0.875rem;
     font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
     color: #000;
 }
 
 .el-dialog__body {
-    padding: 8px;
+    padding: 0.5rem;
 }
 
 .icon-box {
-    width: 40px;
-    height: 40px;
+    width: 2.5rem;
+    height: 2.5rem;
 }
 
 .dialog-footer {
-    margin-right: 60px;
+    margin-right: 3.75rem;
 }
 </style>
