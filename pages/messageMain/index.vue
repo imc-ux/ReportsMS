@@ -284,8 +284,8 @@ function onDeleteTemplateMessageHandler() {
                 <span class="font-size-large">消息管理详细</span>
             </div>
             <div class="justify-flex-end_bottom">
-                <el-button type="primary" @click="onReturnClickHandler">返回</el-button>
-                <el-button type="primary" @click="onDeleteTemplateMessageHandler">删除</el-button>
+                <Button class='btn-icon' @click="onReturnClickHandler">返回</Button>
+                <Button class='btn-icon' @click="onDeleteTemplateMessageHandler">删除</Button>
             </div>
             <div height="100%" class="split">
                 <MarkDownTable :templeteAr="templateData" />

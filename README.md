@@ -1,75 +1,77 @@
-# Nuxt 3 Minimal Starter
+<h1 align="center">Report MS on Nuxt</h1>
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+> Construction
 
-## Setup
+[![nuxt v3.8.2](https://img.shields.io/badge/nuxt-v3.8.2-00DC82.svg)](https://nuxt.com/)
 
-Make sure to install the dependencies:
+> Component
+
+[![element-plus v2.4.3](https://img.shields.io/badge/element--plus-v2.4.3-409EFF.svg)](https://element-plus.org/)
+
+## Introduction
+
+此 Nuxt3 项目用于开发 UX 系统 jtrac(互动)目录下 消息管理、模板管理页面。
+
+## Table of Contents
+
+- [Technologies](#technologies)
+- [Code Formatter](#code-formatter)
+- [Development](#development)
+  - [消息管理](http://127.0.0.1:8080/cusys/reportsMS/messageMain/)
+  - [模板管理](http://127.0.0.1:8080/cusys/reportsMS/template)
+- [Production](#production)
+- [Links](#)
+
+## Technologies
+
+AdvancedNuxt uses the following technologies:
+
+- [Nuxt3](https://v3.nuxtjs.org) as the Vue framework.
+- [TypeScript](https://www.typescriptlang.org) for type safety.
+
+## Code Formatter
+
+- [Prettier](https://prettier.io)
+- [Eslint](https://eslint.org)
+
+## Development
+
+clone this repository
 
 ```bash
-# npm
+git clone git@github.com:imc-ux/ReportsMS.git
+```
+
+install dependencies
+
+```bash
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+local development
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
+
+Start the development server on [http://127.0.0.1:8080/cusys/reportsMS/](http://127.0.0.1:8080/cusys/reportsMS/)
+
+The pages are generated from pages/
+
+#### 消息管理: [http://127.0.0.1:8080/cusys/reportsMS/messageMain/](http://127.0.0.1:8080/cusys/reportsMS/messageMain/)
+
+#### 模板管理: [http://127.0.0.1:8080/cusys/reportsMS/template](http://127.0.0.1:8080/cusys/reportsMS/template)
 
 ## Production
 
-Build the application for production:
+generate: 构建应用程序并生成每个路径作为 HTML 文件。
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+```
+npm run generate
 ```
 
-Locally preview production build:
+生成.output， .output/public/文件夹下内容上传服务器。
 
-```bash
-# npm
-npm run preview
+使用 generate 打包后每个对应的页面都会生成一个 html，打包的时候不能关闭后台，它会请求后台数据生成首屏的数据。
 
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+[Go to Top](#table-of-contents)
