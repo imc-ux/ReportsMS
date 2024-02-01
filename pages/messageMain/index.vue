@@ -179,6 +179,10 @@ function onNewMessageHandler() {
     router.push({ path: '/report' });
 }
 
+function onMessageStatisticsHandler() {
+    router.push({ path: '/messageStatistics' });
+}
+
 function onTabelDetailHandler(index: number, row: any) {
     templateData.value = row;
     showIndex.value = false;
@@ -254,6 +258,7 @@ function onDeleteTemplateMessageHandler() {
             <div class="display-full-width">
                 <div class="justify-flex">
                     <Button class='btn-icon' @click="onNewMessageHandler">新增消息</Button>
+                    <Button class='btn-icon' @click="onMessageStatisticsHandler">消息统计</Button>
                 </div>
                 <div class="justify-flex-end">
                     <Button class='btn-icon' @click="onSearchHandlerClick">Search</Button>

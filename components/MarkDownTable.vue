@@ -4,11 +4,25 @@ import 'md-editor-v3/lib/style.css';
 
 interface Props {
     templeteAr?: any;
+    isShowName?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     templeteAr: {},
+    isShowName: false,
 });
+
+function showName(info: any) {
+    let time: string = '';
+    let userName: string = '';
+    if (info.createTime) {
+        time = info.createTime.substring(0, 19);
+    }
+    if (info.userName) {
+        userName = info.userName;
+    }
+    return userName + ' ' + time;
+}
 
 function templateTable(info: any) {
     if (info && info.templateTitle) {
@@ -59,6 +73,7 @@ function templateTable(info: any) {
 </script>
 
 <template>
+    <span v-show="isShowName" class="span_full_width_style">{{ showName(props.templeteAr) }}</span>
     <MdPreview :modelValue="templateTable(props.templeteAr)" />
 </template>
 
@@ -86,5 +101,10 @@ function templateTable(info: any) {
 
 .min-width-480 {
     min-width: 29.375rem;
+}
+
+.span_full_width_style {
+    width: 100%;
+    padding-left: 1.25rem;
 }
 </style>
