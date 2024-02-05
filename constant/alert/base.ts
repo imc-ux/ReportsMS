@@ -1,6 +1,7 @@
 export enum CommonAlert {
   INTERNET_ERROR = "网络错误!",
   SAVE_DATA_SUCCESS = "保存成功!",
+  RECOVER_DATA_SUCCESS = '恢复成功!',
   DELETE_DATA_SUCCESS = "删除成功!",
   WHETHER_DELETE_TEMP = "是否删除模板?",
   WHETHER_DELETE_MESSAGE = "是否删除此消息?",

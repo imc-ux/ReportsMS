@@ -9,4 +9,5 @@ export enum service {
   CreateUserTemplate = "createUserTemplate", //创建消息
   SendTemplateMsg = "chat-sendTemplateMsg", //发送消息
   GetUserActivePermission = 'getUserActivePermission',//权限管理
+  UpdateUserTemplate = 'updateUserTemplate',//管理
 }
