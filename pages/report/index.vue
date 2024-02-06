@@ -471,11 +471,11 @@ function onBtnPreviewClickHandler() {
 }
 
 .operate-btn {
-  margin:0rem auto 0.5rem auto;
+  margin: 0rem auto 0.5rem auto;
   display: block;
 }
 
 .operate-btn:hover {
-  margin:0rem auto 0.5rem auto;
+  margin: 0rem auto 0.5rem auto;
 }
 </style>
