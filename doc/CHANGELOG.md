@@ -2,11 +2,13 @@
 
 ### Features
 
--
+- 主要issue54 51 50问题修正
 
 ### Bug Fixes
 
-- #54 #51 #50
+- #54 模板列表显示顺序问题修正
+- #51 主要新增删除与否以及恢复功能
+- #50 查看消息增加修改与发送功能
 
 ## [V1.0.2](https://github.com/imc-ux/ReportsMS/releases/tag/v1.0.2) (2024-2-1)
 
