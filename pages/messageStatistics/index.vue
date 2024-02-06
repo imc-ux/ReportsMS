@@ -1,69 +1,101 @@
 <script lang="ts" setup>
-import { reactive, ref, provide } from 'vue';
-import type { TabsPaneContext } from 'element-plus'
-import { ElTabs, ElTabPane, ElDatePicker, ElTable, ElTableColumn, ElLink } from 'element-plus';
-import { getTemplateList, getUserTemplateList } from '@/api/messageStaticsApi';
-import { useState, useRouter } from 'nuxt/app';
-import { onMounted } from 'vue';
-import { format, subDays } from "date-fns";
+import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElCheckbox } from 'element-plus';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute, useState } from 'nuxt/app';
+import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate, getUserActivePermission, updateUserTemplate } from '@/api/messageApi';
 import { TemplateHistory } from '@/vo';
-import {
-    ChartComponent as EjsChart,
-    SeriesCollectionDirective as ESeriesCollection,
-    SeriesDirective as ESeries,
-    Legend,
-    LineSeries,
-    Category,
-    Tooltip,
-} from '@syncfusion/ej2-vue-charts';
-import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
+import { ShowAlert } from '@/components/alert';
+import { CommonAlert } from '@/constant/alert/base';
 import MarkDownTable from '@/components/MarkDownTable.vue';
+import { format, subWeeks } from "date-fns";
+import { UserInfo } from "@/utils/Settings";
+import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 
 const router = useRouter();
-const fitFlag = ref<boolean>(false);
-const legendSettings = ref<any>({ visible: false });
-const tabReportName = ref<string>('');
-const tableDivWidth = ref<string>('width: 0px');
-const chartDivWidth = ref<string>('0px');
-const tableCode = ref<string>('A');
-const timeCode = ref<number>(7);
-const dateValue = ref<any>([subDays(new Date, 6), new Date()]);
-const tableList = reactive<any[]>([{ name: '消息发送人数', code: 'A' }, { name: '消息发送次数', code: 'B' }, { name: '人均发送次数', code: 'C' }]);
-const timeList = reactive<any[]>([{ name: '1日', code: 1 }, { name: '7日', code: 7 }, { name: '14日', code: 14 }, { name: '30日', code: 30 }]);
-const templateList = ref<any[]>([]);
-const tableMessageData = ref<any[]>([]);
-const titleNames = ref<any[]>([]);
-const seriesColumnsData = ref<any[]>([]);
-const primaryXAxis = ref<any>({ valueType: 'Category', interval: 1 });
-const tooltip = ref<any>({
-    enable: true,
-    format: "${point.x} : <b>${point.y}</b>"
-});
-const marker = ref<any>({ visible: true, width: 10, height: 10, shape: 'Diamond' });
-const messageUserCount = ref<number>(0);
-const messageCount = ref<number>(0);
-const messagePerCount = ref<any>(0);
-const showPage = ref<any>(true);
-const templateMarkData = ref<any[]>([]);
+const route = useRoute();
+const clearable = ref<boolean>(true);
+const dateValue = ref<any>('');
+const selectedModel = ref<string>('');
+const selectedUser = ref<string>('');
+const selectDeleteNid = ref<string>('');
+const inputMessage = ref<string>('');
+const tableData = ref<any>([]);
+const modelTypes = ref<any[]>([]);
+const userNames = ref<any[]>([]);
+const iPageCount = 20;
+const iPage = ref<number>(1);
+const totalCount = ref<number>(0);
+const templateData = ref<any>({});
+const showIndex = ref<any>(true);
+const count = ref<number>(0);
+const userPermission = ref<string>('');
+const checkedY = ref<boolean>(false);
+const checkedN = ref<boolean>(true);
+const showDeleteBtn = ref<boolean>(false);
+const templateMessageData = useState<any>('templateMessageData', () => { });
 
-provide('chart', [Category, Legend, Tooltip, LineSeries]);
+const updateTemplate = async () => {
+    try {
+        const info: TemplateHistory = {};
+        info.nid = templateData.value.nid;
+        info.isDelete = 'N';
+        const res: any = await updateUserTemplate(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            templateData.value.isDelete = 'N';
+            showDeleteBtn.value = false;
+            ShowAlert(CommonAlert.RECOVER_DATA_SUCCESS, 0);
+        }
+    } catch (error) {
 
-onMounted(() => {
-    templateSearchList();
-});
+    }
+}
 
-const templateSearchList = async () => {
+const getUserPermission = async () => {
+    try {
+        const userId = UserInfo.userId;
+        const res: any = await getUserActivePermission(userId);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            overCount();
+            userPermission.value = result.data;
+            if (userPermission.value.indexOf('T_B') >= 0) {
+                dateValue.value = [new Date(), new Date()];
+            } else {
+                dateValue.value = [subWeeks(new Date(), 1), new Date()];
+            }
+        }
+    } catch (error) {
+
+    }
+}
+
+const userList = async () => {
+    try {
+        const info: any = {};
+        info.blockflag = "N";
+        info.usertype = "U";
+        info.iStart = 0;
+        info.iPageCount = iPageCount;
+        const res: any = await getUserList(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            overCount();
+            userNames.value = result.data;
+        }
+    } catch (error) {
+
+    }
+};
+
+const templateList = async () => {
     try {
         const info: any = {};
         const res: any = await getTemplateList(info);
         let result = JSON.parse(res.data.value);
-        setWaiting();
         if (!result.error) {
-            removeWaiting();
-            templateList.value = result.data;
-            if (result.data?.length > 0) {
-                tabReportName.value = result.data[0].nid;
-            }
+            overCount();
+            modelTypes.value = result.data;
         }
     } catch (error) {
 
@@ -77,299 +109,267 @@ const searchInfo = async () => {
             info.dateFrom = format(dateValue.value[0], "yyyy-MM-dd");
             info.dateTo = format(dateValue.value[1], "yyyy-MM-dd");
         }
-        info.content = '';
-        info.userId = '';
-        info.templateId = (Number)(tabReportName.value);
-        info.iPageCount = 100000;
-        info.isDelete = 'N';
-        info.iStart = 0;
-        setWaiting();
+        info.content = inputMessage.value;
+        if (userPermission.value.indexOf('T_B') >= 0) {
+            info.userId = selectedUser.value;
+        } else {
+            info.userId = UserInfo.userId;
+        }
+        if (checkedY.value && checkedN.value) {
+            info.isDelete = '';
+        } else {
+            if (checkedY.value) {
+                info.isDelete = 'Y';
+            }
+            if (checkedN.value) {
+                info.isDelete = 'N';
+            }
+        }
+        if (selectedModel.value) {
+            info.templateId = (Number)(selectedModel.value);
+        }
+        info.iPageCount = iPageCount;
+        info.iStart = (iPage.value - 1) * iPageCount;
+        console.log(info);
         const res: any = await getUserTemplateList(info);
         let result = JSON.parse(res.data.value);
         if (!result.error) {
-            removeWaiting();
-            let times: string[] = [];
-            let userMap: Map<string, any> = new Map<string, any>();
-            let mapTimes: Map<string, any> = new Map<string, any>();
-            let mapUserTimes: Map<string, any> = new Map<string, any>();
-            result.data?.forEach((elem: any) => {
-                elem.createDate = formatDate(elem.createTime);
-                if (elem.userId) {
-                    let key: string = elem.createDate;
-                    let userIDKey: string = elem.userId;
-                    let keyUser: string = elem.userId + '@' + elem.createDate;
-                    if (!userMap.get(userIDKey)) {
-                        let userInfo: any = {};
-                        userInfo.code = elem.userId;
-                        userInfo.name = elem.userName;
-                        userMap.set(userIDKey, userInfo);
-                    }
-                    if (!mapTimes.get(key)) {
-                        times.push(key);
-                        let info: any = {};
-                        info.createDate = key;
-                        info.contents = [elem];
-                        mapTimes.set(key, info);
-                    } else {
-                        mapTimes.get(key)?.contents.push(elem);
-                    }
-                    if (!mapUserTimes.get(keyUser)) {
-                        let userInfo: any = {};
-                        userInfo.createDate = elem.createDate;
-                        userInfo.userId = elem.userId;
-                        userInfo.contents = [elem];
-                        mapUserTimes.set(keyUser, userInfo);
-                    } else {
-                        mapUserTimes.get(keyUser)?.contents.push(elem);
-                    }
-                }
-            });
-            let titles: any[] = [];
-            times?.forEach((elem: any, index: number) => {
-                let timeInfo: any = {};
-                timeInfo.name = elem;
-                timeInfo.code = 'time' + index;
-                titles.push(timeInfo);
-            })
-            titles.sort(compare('name'));
-            titleNames.value = titles;
-            let tables: any[] = [];
-            userMap?.forEach((elem: any) => {
-                let tableInfo: any = {};
-                tableInfo.userId = elem.code;
-                tableInfo.userName = elem.name;
-                titles?.forEach((info: any) => {
-                    let key = elem.code + '@' + info.name;
-                    if (mapUserTimes.get(key)) {
-                        tableInfo[info.code] = mapUserTimes.get(key)?.contents?.length;
-                    } else {
-                        tableInfo[info.code] = 0;
-                    }
-                    tableInfo[info.code + 'contents'] = mapUserTimes.get(key)?.contents;
-                })
-                tables.push(tableInfo);
-            })
-            let tableTwoInfo: any = {};
-            tableTwoInfo.userId = '';
-            tableTwoInfo.userName = 'total';
-            let messageTotal: number = 0;
-            titles?.forEach((info: any) => {
-                let key = info.name;
-                if (mapTimes.get(key)) {
-                    tableTwoInfo[info.code] = mapTimes.get(key)?.contents?.length;
-                    messageTotal += mapTimes.get(key)?.contents?.length;
-                } else {
-                    tableTwoInfo[info.code] = 0;
-                }
-                tableTwoInfo[info.code + 'contents'] = mapTimes.get(key)?.contents;
-            })
-            tables.push(tableTwoInfo);
-            //表格数据以及图表宽度
-            tableMessageData.value = tables;
-            tableDivWidth.value = 'width:' + (titles.length + 1) * 160 + 'px';
-            //图表数据解析
-            let chartDatas: any[] = [];
-            titles.forEach((elem: any, index: number) => {
-                let chartInfo: any = {};
-                chartInfo.name = elem.name;
-                let userIds: string[] = [];
-                let userIdsMap: Map<string, any> = new Map<string, any>();
-                if (mapTimes.get(elem.name)?.contents?.length > 0) {
-                    mapTimes.get(elem.name)?.contents.forEach((info: any) => {
-                        if (!userIdsMap.get(info.userId)) {
-                            userIds.push(info.userId);
-                            userIdsMap.set(info.userId, info.userId);
-                        }
-                    })
-                }
-                let total: number = mapTimes.get(elem.name)?.contents?.length ?? 0;
-                let userCount: number = userIds.length ?? 0;
-                chartInfo.y1Name = total;
-                chartInfo.y2Name = userCount;
-                chartInfo.y3Name = (total / userCount).toFixed(1);
-                chartDatas.push(chartInfo);
-            });
-            seriesColumnsData.value = chartDatas;
-            //图表宽度
-            chartDivWidth.value = (titles.length + 1) * 160 + 'px';
-            //消息发送人数
-            messageUserCount.value = userMap.size;
-            //消息发送次数
-            messageCount.value = messageTotal;
-            //人均发送次数
-            messagePerCount.value = userMap.size !== 0 ? (messageTotal / userMap.size).toFixed(1) : 0;
+            overCount();
+            tableData.value = result.data;
+            if (result.data && result.data.length > 0) {
+                totalCount.value = (Number)(result.data[0].totalCount);
+            } else {
+                totalCount.value = 0;
+            }
         }
     } catch (error) {
 
     }
 }
 
-//时间段排序升序 sort true 升序 false 降序
-function compare(prop: string, sort: boolean = true) {
-    return function (obj1: any, obj2: any) {
-        let val1 = obj1[prop];
-        let val2 = obj2[prop];
-        if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
-            val1 = Number(val1);
-            val2 = Number(val2);
+const deleteTemplate = async () => {
+    try {
+        const info: TemplateHistory = {};
+        info.nid = (Number)(selectDeleteNid.value);
+        setWaiting();
+        const res: any = await deleteUserTemplate(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            removeWaiting();
+            ShowAlert(CommonAlert.DELETE_DATA_SUCCESS, 0, deletePageHandler);
         }
-        if (val1 < val2) {
-            return sort ? -1 : 1;
-        } else if (val1 > val2) {
-            return sort ? 1 : -1;
-        } else {
-            return 0;
-        }
+    } catch (error) {
+
     }
 }
 
-function formatDate(str: string) {
-    return str.substring(0, 10);
-}
+onMounted(() => {
+    if (route.query?.type === 'search') {
+        count.value = 4;
+        iPage.value = 1;
+        searchInfo();;
+    } else {
+        count.value = 3;
+    }
+    userList();
+    templateList();
+    getUserPermission();
+    setWaiting();
+});
 
-function onBtnTabDateChangeClickHandler(tab: TabsPaneContext) {
-    let daySub = tab.props.name as number;
-    dateValue.value = [subDays(new Date, daySub - 1), new Date()];
-}
-
-function onSearchHandlerClick() {
+function deletePageHandler() {
+    showIndex.value = true;
     searchInfo();
 }
 
-function onResetHandlerClick() {
-    if (templateList.value?.length > 0) {
-        tabReportName.value = templateList.value[0].nid;
-    } else {
-        tabReportName.value = '';
+function overCount() {
+    count.value--;
+    if (count.value === 0) {
+        removeWaiting();
     }
-    timeCode.value = 1;
-    dateValue.value = [new Date(), new Date()];
-    tableCode.value = 'A';
 }
 
-function onTabelDetailHandler(row: any, field: string) {
-    templateMarkData.value = row[field + 'contents'];
-    showPage.value = false;
+function onSearchHandlerClick() {
+    count.value = 1;
+    iPage.value = 1;
+    searchInfo();
+    setWaiting();
+}
+
+function onResetHandlerClick() {
+    if (userPermission.value.indexOf('T_B') >= 0) {
+        dateValue.value = [new Date(), new Date()];
+    } else {
+        dateValue.value = [subWeeks(new Date(), 1), new Date()];
+    }
+    selectedModel.value = '';
+    selectedUser.value = ''
+    inputMessage.value = '';
+    checkedY.value = false;
+    checkedN.value = true;
+}
+
+function onNewMessageHandler() {
+    router.push({ path: '/report' });
+}
+
+function onMessageStatisticsHandler() {
+    router.push({ path: '/messageStatistics' });
+}
+
+function onTabelDetailHandler(_index: number, row: any) {
+    templateData.value = row;
+    if (row.isDelete === 'Y') {
+        showDeleteBtn.value = true;
+    } else {
+        showDeleteBtn.value = false;
+    }
+    showIndex.value = false;
 }
 
 function onReturnClickHandler() {
-    showPage.value = true;
+    templateMessageData.value = {};
+    showIndex.value = true;
 }
 
-function onMessageHandler() {
-    router.push({ path: '/messageMain' });
+function onTabelDeleteHandler(index: number, row: any) {
+    selectDeleteNid.value = row.nid;
+    ShowAlert(CommonAlert.WHETHER_DELETE_MESSAGE, 2, () => deleteTemplate());
+}
+
+function handleCurrentChange(val: number) {
+    iPage.value = val;
+    searchInfo();
+}
+
+function onDeleteTemplateMessageHandler() {
+    selectDeleteNid.value = templateData.value.nid
+    ShowAlert(CommonAlert.WHETHER_DELETE_MESSAGE, 2, () => deleteTemplate());
+}
+
+function onUpdateTemplateMessageHandler() {
+    templateMessageData.value = templateData.value;
+    router.push({ path: '/report' });
+}
+
+function onTemplateMessageHandler() {
+    updateTemplate();
 }
 
 </script>
-
 <template>
     <client-only>
-        <div v-show="showPage" class="box-top">
+        <div v-show="showIndex" class="box-top">
             <div class="box-display">
-                <span class="font-size-x-large">消息管理统计</span>
+                <span class="font-size-large">消息管理</span>
             </div>
-            <div class="box-display-height-50">
-                <div class="box-display-grow_border">
-                    <div class="box-display-grow_item">
-                        <span class="font-size-title-large">消息发送人数</span>
-                    </div>
-                    <div class="box-display-grow_item">
-                        <span class="font-size-large-x">{{ messageUserCount }}</span>
-                    </div>
-                </div>
-                <div class="box-display-grow_border">
-                    <div class="box-display-grow_item">
-                        <span class="font-size-title-large">消息发送次数</span>
-                    </div>
-                    <div class="box-display-grow_item">
-                        <span class="font-size-large-x">{{ messageCount }}</span>
-                    </div>
-                </div>
-                <div class="box-display-grow_height">
-                    <div class="box-display-grow_item">
-                        <span class="font-size-title-large">人均发送次数</span>
-                    </div>
-                    <div class="box-display-grow_item">
-                        <span class="font-size-large-x">{{ messagePerCount }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tabs_flex_direction">
-                <div class="tabs_flex">
-                    <span class="span_border" type="border-card">关键指标详解</span>
-                    <el-tabs v-model="tableCode" type="card">
-                        <el-tab-pane v-for="item in tableList" :key="item.code" :label="item.name" :name="item.code" />
-                    </el-tabs>
-                </div>
-                <div class="box-display_border">
-                    <span class="span_width">时间</span>
-                    <div class="tabs_flex_two">
-                        <el-tabs v-model="timeCode" type="card" @tab-click="onBtnTabDateChangeClickHandler">
-                            <el-tab-pane v-for="item in timeList" :key="item.code" :label="item.name" :name="item.code" />
-                        </el-tabs>
+            <div class="box-display-item">
+                <div class="box-width">
+                    <div class="box-width-80">
+                        <span>发送时间</span>
                     </div>
                     <div class="box-width-380">
-                        <el-date-picker v-model="dateValue" size="large" type="daterange" range-separator="至">
+                        <el-date-picker v-model="dateValue" type="daterange" range-separator="~">
                         </el-date-picker>
                     </div>
-                    <div class="tabs_flex_two">
-                        <el-tabs v-model="tabReportName" type="card">
-                            <el-tab-pane v-for="item in templateList" :key="item.nid" :label="item.name" :name="item.nid" />
-                        </el-tabs>
+                </div>
+                <div class="box-display-grow">
+                    <div class="box-width-80">
+                        <span>模板类型</span>
+                    </div>
+                    <div class="box-flex-margin">
+                        <el-select v-model="selectedModel" placeholder="请选择" :clearable="clearable">
+                            <el-option v-for="item in modelTypes" :key="item.nid" :label="item.name" :value="item.nid">
+                            </el-option>
+                        </el-select>
                     </div>
                 </div>
-                <div class="display-full-width">
-                    <div class="justify-flex">
-                        <Button class='btn-icon' @click="onMessageHandler">消息管理</Button>
+                <div v-show="userPermission.indexOf('T_B') >= 0" class="box-display-grow">
+                    <div class="box-margin-width-64">
+                        <span>发送人</span>
                     </div>
-                    <div class="justify-flex-end">
-                        <Button class='btn-icon' @click="onSearchHandlerClick">Search</Button>
-                        <Button class='btn-icon marginLeft' @click="onResetHandlerClick">Reset</Button>
-                    </div>
-                </div>
-                <div v-if="tableMessageData.length > 1" class="full-width-padding-10">
-                    <div v-if="tableMessageData.length > 1" :style="tableDivWidth">
-                        <ejs-chart :width='chartDivWidth' height='300' :primaryXAxis="primaryXAxis" :tooltip="tooltip"
-                            :legendSettings="legendSettings">
-                            <e-series-collection>
-                                <e-series v-if="tableCode === 'A'" :dataSource="seriesColumnsData" type="Line" xName="name"
-                                    yName="y1Name" :marker="marker"></e-series>
-                                <e-series v-if="tableCode === 'B'" :dataSource="seriesColumnsData" type="Line" xName="name"
-                                    yName="y2Name" :marker="marker"></e-series>
-                                <e-series v-if="tableCode === 'C'" :dataSource="seriesColumnsData" type="Line" xName="name"
-                                    yName="y3Name" :marker="marker"></e-series>
-                            </e-series-collection>
-                        </ejs-chart>
-                        <el-table :data="tableMessageData" border :fit='fitFlag'>
-                            <el-table-column header-align="center" align="center" prop="userName" label="发送人" width="160" />
-                            <el-table-column v-for="item in titleNames" header-align="center" align="center"
-                                :prop="item.code" :label="item.name" width="160">
-                                <template #default="scope">
-                                    <el-link v-if="scope.row[item.code] > 0" class="font-size-12" href="#" type="primary"
-                                        @click="onTabelDetailHandler(scope.row, item.code)">{{
-                                            scope.row[item.code] }}</el-link>
-                                </template>
-                            </el-table-column>
-                        </el-table>
+                    <div class="box-flex-margin">
+                        <el-select v-model="selectedUser" placeholder="请选择" :clearable="clearable">
+                            <el-option v-for="item in userNames" :key="item.nid" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
                     </div>
                 </div>
+                <div class="box-display-grow">
+                    <div class="box-margin-width-100">
+                        <span>发送内容</span>
+                    </div>
+                    <div class="main-input margin-left-right">
+                        <el-input v-model="inputMessage" placeholder="请输入内容"></el-input>
+                    </div>
+                </div>
+                <div class="box-display-grow">
+                    <div class="box-margin-width-100">
+                        <span>删除与否</span>
+                    </div>
+                    <div class="main-input margin-left-right">
+                        <el-checkbox v-model="checkedY">Y</el-checkbox>
+                        <el-checkbox v-model="checkedN">N</el-checkbox>
+                    </div>
+                </div>
+            </div>
+            <div class="display-full-width">
+                <div class="justify-flex">
+                    <Button class='btn-icon' @click="onNewMessageHandler">新增消息</Button>
+                    <Button class='btn-icon' @click="onMessageStatisticsHandler">消息统计</Button>
+                </div>
+                <div class="justify-flex-end">
+                    <Button class='btn-icon' @click="onSearchHandlerClick">Search</Button>
+                    <Button class='btn-icon marginLeft' @click="onResetHandlerClick">Reset</Button>
+                </div>
+            </div>
+            <div>
+                <el-table :data="tableData" border class="width-max" max-height="800">
+                    <el-table-column header-align="center" align="center" prop="templateName" label="模板类型" />
+                    <el-table-column header-align="center" align="center" prop="userName" label="发送人" />
+                    <el-table-column header-align="center" align="center" prop="createTime" label="发送时间" />
+                    <el-table-column header-align="center" align="center" label="操作">
+                        <template #default="scope">
+                            <el-button type="text" size="small"
+                                @click="onTabelDetailHandler(scope.$index, scope.row)">详细</el-button>
+                            <el-button type="text" size="small"
+                                @click="onTabelDeleteHandler(scope.$index, scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination v-if="totalCount > 0" :page-size="iPageCount" :currentPage="iPage"
+                    layout="total, prev, pager, next" :total="totalCount" @current-change="handleCurrentChange">
+                </el-pagination>
             </div>
         </div>
-        <div v-show="!showPage" class="width-min">
+        <div v-show="!showIndex" class="width-min">
             <div class="box-display">
-                <span class="font-size-x-large">消息管理统计详细</span>
+                <span class="font-size-large">消息管理详细</span>
             </div>
             <div class="justify-flex-end_bottom">
+                <Button v-show="!showDeleteBtn" class='btn-icon' @click="onUpdateTemplateMessageHandler">编辑</Button>
+                <Button v-show="showDeleteBtn" class='btn-icon' @click="onTemplateMessageHandler">恢复</Button>
+                <Button class='btn-icon' @click="onDeleteTemplateMessageHandler">删除</Button>
                 <Button class='btn-icon' @click="onReturnClickHandler">返回</Button>
             </div>
-            <div height="100%" class="split tabs_flex_direction">
-                <MarkDownTable v-for="item in templateMarkData" :templeteAr="item" :isShowName=true />
+            <div height="100%" class="split">
+                <MarkDownTable :templeteAr="templateData" />
             </div>
         </div>
     </client-only>
 </template>
 
 <style>
+.justify-flex-end_bottom {
+    justify-content: flex-end;
+    display: flex;
+    padding-bottom: 0.3125rem;
+}
+
+.font-size-large {
+    font-size: x-large;
+}
+
 .box-top {
     width: 100%;
     min-width: 79.1875rem
@@ -382,101 +382,54 @@ function onMessageHandler() {
     width: 100%
 }
 
-.font-size-x-large {
-    font-size: x-large;
-}
-
-.font-size-title-large {
-    font-size: 1.125rem;
-}
-
-.font-size-large-x {
-    font-size: 0.875rem;
-}
-
-.box-display-height-50 {
+.box-display-item {
     display: flex;
-    height: 3.125rem;
-    border: 0.0625rem solid #cacaca;
-    align-items: center;
-    margin-bottom: 0.3125rem;
-}
-
-.box-display-grow_border {
-    display: flex;
-    flex-grow: 1;
-    border-right: 0.0625rem solid #cacaca;
-    height: 3.125rem;
-    flex-direction: column;
-}
-
-.box-display-grow_height {
-    display: flex;
-    flex-grow: 1;
-    height: 3.125rem;
-    flex-direction: column;
-}
-
-.box-display-grow_item {
-    display: flex;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-}
-
-.header {
-    display: flex;
-    height: 1.25rem;
-    position: relative;
-}
-
-.tabs_flex {
-    display: flex;
-}
-
-.tabs_flex_direction {
-    display: flex;
-    flex-direction: column;
-}
-
-.span_border {
-    display: flex;
-    font-size: 0.875rem;
     height: 2.5rem;
-    border-top: 0.0625rem solid #cacaca;
-    border-left: 0.0625rem solid #cacaca;
-    align-items: center;
-    padding-left: 0.625rem;
-    padding-right: 0.625rem;
-}
-
-.box-display_border {
-    display: flex;
-    width: 100%;
-    height: 2.8125rem;
     border: 0.0625rem solid #cacaca;
     align-items: center;
 }
 
-.span_width {
-    width: 3.125rem;
-    font-size: 0.875rem;
-    text-align: center;
-    padding-left: 0.3125rem;
-    padding-right: 0.3125rem;
+.box-width {
+    display: flex;
+    width: 30rem;
 }
 
-.tabs_flex_two {
-    display: flex;
-    border-bottom: 0.0625rem solid #cacaca;
+.box-width-80 {
+    width: 5rem;
+    margin-left: 0.3125rem;
+    margin-top: 0.25rem;
 }
 
 .box-width-380 {
     width: 23.75rem;
 }
 
-.margin-left {
+.box-flex-margin {
     margin-left: 0.3125rem;
+    margin-right: 0.3125rem;
+    flex-grow: 1;
+}
+
+.box-display-grow {
+    display: flex;
+    flex-grow: 1;
+}
+
+.box-margin-width-64 {
+    width: 4rem;
+    margin-left: 1.25rem;
+    margin-top: 0.25rem
+}
+
+.box-margin-width-100 {
+    width: 6.25rem;
+    margin-left: 1.25rem;
+    margin-top: 0.25rem
+}
+
+.margin-left-right {
+    margin-left: 0.3125rem;
+    margin-right: 0.3125rem;
 }
 
 .display-full-width {
@@ -495,19 +448,25 @@ function onMessageHandler() {
     display: flex;
 }
 
-.font-size-12 {
-    font-size: 0.75rem;
-}
-
-.justify-flex-end_bottom {
-    justify-content: flex-end;
-    display: flex;
-    padding-bottom: 0.3125rem;
-}
-
-.full-width-padding-10 {
+.width-max {
     width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0.625rem;
+}
+
+.width-min {
+    width: 100%;
+    min-width: 79.1875rem;
+}
+
+.marginLeft {
+    margin-left: 0.3125rem;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner {
+    background-color: #08adaa;
+    border-color: #08adaa;
+}
+
+.el-checkbox__input.is-checked+.el-checkbox__label {
+    color: #303133;
 }
 </style>

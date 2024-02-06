@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
+import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElCheckbox } from 'element-plus';
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute, useState } from 'nuxt/app';
-import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate, getUserActivePermission } from '@/api/messageApi';
+import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate, getUserActivePermission, updateUserTemplate } from '@/api/messageApi';
 import { TemplateHistory } from '@/vo';
 import { ShowAlert } from '@/components/alert';
 import { CommonAlert } from '@/constant/alert/base';
@@ -14,21 +14,60 @@ import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 const router = useRouter();
 const route = useRoute();
 const clearable = ref<boolean>(true);
-const dateValue = useState<any>('dateValue', () => '');
-const selectedModel = useState<string>('selectedModel', () => '');
-const selectedUser = useState<string>('selectedUser', () => '');
-const selectDeleteNid = useState<string>('selectDeleteNid', () => '');
-const inputMessage = useState<string>('inputMessage', () => '');
-const tableData = useState<any>('tableData', () => []);
-const modelTypes = useState<any[]>('modelTypes', () => []);
-const userNames = useState<any[]>('userNames', () => []);
+const dateValue = ref<any>('');
+const selectedModel = ref<string>('');
+const selectedUser = ref<string>('');
+const selectDeleteNid = ref<string>('');
+const inputMessage = ref<string>('');
+const tableData = ref<any>([]);
+const modelTypes = ref<any[]>([]);
+const userNames = ref<any[]>([]);
 const iPageCount = 20;
-const iPage = useState<number>('iPage', () => 1);
-const totalCount = useState<number>('totalCount', () => 0);
-const templateData = useState<any>('templateData', () => { });
-const showIndex = useState<any>('showIndex', () => true);
-const count = useState<number>('count', () => 0);
-const userPermission = useState<string>('userPermission', () => '');
+const iPage = ref<number>(1);
+const totalCount = ref<number>(0);
+const templateData = ref<any>({});
+const showIndex = ref<any>(true);
+const count = ref<number>(0);
+const userPermission = ref<string>('');
+const checkedY = ref<boolean>(false);
+const checkedN = ref<boolean>(true);
+const showDeleteBtn = ref<boolean>(false);
+const updateFlag = ref<boolean>(false);
+const deleteInfo = ref<any>({});
+const templateMessageData = useState<any>('templateMessageData', () => { });
+
+const updatePageTemplate = async () => {
+    try {
+        const info: TemplateHistory = {};
+        info.nid = deleteInfo.value.nid;
+        info.isDelete = 'N';
+        const res: any = await updateUserTemplate(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            ShowAlert(CommonAlert.RECOVER_DATA_SUCCESS, 0, recoverPageHandler);
+        }
+    } catch (error) {
+
+    }
+}
+
+const updateTemplate = async () => {
+    try {
+        const info: TemplateHistory = {};
+        info.nid = templateData.value.nid;
+        info.isDelete = 'N';
+        const res: any = await updateUserTemplate(info);
+        let result = JSON.parse(res.data.value);
+        if (!result.error) {
+            templateData.value.isDelete = 'N';
+            showDeleteBtn.value = false;
+            updateFlag.value = true;
+            ShowAlert(CommonAlert.RECOVER_DATA_SUCCESS, 0);
+        }
+    } catch (error) {
+
+    }
+}
 
 const getUserPermission = async () => {
     try {
@@ -94,6 +133,16 @@ const searchInfo = async () => {
         } else {
             info.userId = UserInfo.userId;
         }
+        if (checkedY.value && checkedN.value) {
+            info.isDelete = '';
+        } else {
+            if (checkedY.value) {
+                info.isDelete = 'Y';
+            }
+            if (checkedN.value) {
+                info.isDelete = 'N';
+            }
+        }
         if (selectedModel.value) {
             info.templateId = (Number)(selectedModel.value);
         }
@@ -147,6 +196,14 @@ onMounted(() => {
 
 function deletePageHandler() {
     showIndex.value = true;
+    count.value = 1;
+    setWaiting();
+    searchInfo();
+}
+
+function recoverPageHandler() {
+    count.value = 1;
+    setWaiting();
     searchInfo();
 }
 
@@ -173,6 +230,8 @@ function onResetHandlerClick() {
     selectedModel.value = '';
     selectedUser.value = ''
     inputMessage.value = '';
+    checkedY.value = false;
+    checkedN.value = true;
 }
 
 function onNewMessageHandler() {
@@ -183,12 +242,24 @@ function onMessageStatisticsHandler() {
     router.push({ path: '/messageStatistics' });
 }
 
-function onTabelDetailHandler(index: number, row: any) {
+function onTabelDetailHandler(_index: number, row: any) {
     templateData.value = row;
+    if (row.isDelete === 'Y') {
+        showDeleteBtn.value = true;
+    } else {
+        showDeleteBtn.value = false;
+    }
     showIndex.value = false;
 }
 
 function onReturnClickHandler() {
+    templateMessageData.value = {};
+    if (updateFlag.value) {
+        updateFlag.value = false;
+        count.value = 1;
+        setWaiting();
+        searchInfo();
+    }
     showIndex.value = true;
 }
 
@@ -197,14 +268,42 @@ function onTabelDeleteHandler(index: number, row: any) {
     ShowAlert(CommonAlert.WHETHER_DELETE_MESSAGE, 2, () => deleteTemplate());
 }
 
+function onTabelResoreHandler(index: number, row: any) {
+    deleteInfo.value = row;
+    updatePageTemplate();
+}
+
 function handleCurrentChange(val: number) {
     iPage.value = val;
+    count.value = 1;
+    setWaiting();
     searchInfo();
 }
 
 function onDeleteTemplateMessageHandler() {
     selectDeleteNid.value = templateData.value.nid
     ShowAlert(CommonAlert.WHETHER_DELETE_MESSAGE, 2, () => deleteTemplate());
+}
+
+function onUpdateTemplateMessageHandler() {
+    templateMessageData.value = templateData.value;
+    router.push({ path: '/report' });
+}
+
+function onTemplateMessageHandler() {
+    updateTemplate();
+}
+
+function deleteFlagYHandler() {
+    if (!checkedN.value && !checkedY.value) {
+        checkedY.value = true;
+    }
+}
+
+function deleteFlagNHandler() {
+    if (!checkedN.value && !checkedY.value) {
+        checkedN.value = true;
+    }
 }
 
 </script>
@@ -254,6 +353,15 @@ function onDeleteTemplateMessageHandler() {
                         <el-input v-model="inputMessage" placeholder="请输入内容"></el-input>
                     </div>
                 </div>
+                <div class="box-display-grow">
+                    <div class="box-margin-width-100">
+                        <span>删除与否</span>
+                    </div>
+                    <div class="main-input margin-left-right">
+                        <el-checkbox v-model="checkedY" @change="deleteFlagYHandler">Y</el-checkbox>
+                        <el-checkbox v-model="checkedN" @change="deleteFlagNHandler">N</el-checkbox>
+                    </div>
+                </div>
             </div>
             <div class="display-full-width">
                 <div class="justify-flex">
@@ -274,8 +382,10 @@ function onDeleteTemplateMessageHandler() {
                         <template #default="scope">
                             <el-button type="text" size="small"
                                 @click="onTabelDetailHandler(scope.$index, scope.row)">详细</el-button>
-                            <el-button type="text" size="small"
+                            <el-button v-if="scope.row.isDelete === 'N'" type="text" size="small"
                                 @click="onTabelDeleteHandler(scope.$index, scope.row)">删除</el-button>
+                            <el-button v-if="scope.row.isDelete === 'Y'" type="text" size="small"
+                                @click="onTabelResoreHandler(scope.$index, scope.row)">恢复</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -289,8 +399,10 @@ function onDeleteTemplateMessageHandler() {
                 <span class="font-size-large">消息管理详细</span>
             </div>
             <div class="justify-flex-end_bottom">
-                <Button class='btn-icon' @click="onReturnClickHandler">返回</Button>
+                <Button v-show="!showDeleteBtn" class='btn-icon' @click="onUpdateTemplateMessageHandler">编辑</Button>
+                <Button v-show="showDeleteBtn" class='btn-icon' @click="onTemplateMessageHandler">恢复</Button>
                 <Button class='btn-icon' @click="onDeleteTemplateMessageHandler">删除</Button>
+                <Button class='btn-icon' @click="onReturnClickHandler">返回</Button>
             </div>
             <div height="100%" class="split">
                 <MarkDownTable :templeteAr="templateData" />
@@ -399,5 +511,14 @@ function onDeleteTemplateMessageHandler() {
 
 .marginLeft {
     margin-left: 0.3125rem;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner {
+    background-color: #08adaa;
+    border-color: #08adaa;
+}
+
+.el-checkbox__input.is-checked+.el-checkbox__label {
+    color: #303133;
 }
 </style>
