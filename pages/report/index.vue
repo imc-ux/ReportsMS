@@ -7,7 +7,7 @@ import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "@/vo
 import { CommonAlert } from '@/constant/alert/base';
 import { ShowAlert } from '@/components/alert';
 import type { TabsPaneContext } from 'element-plus'
-import { getTemplateList, createUserTemplate, sendTemplateMsg } from '~/api/templateApi';
+import { getTemplateList, createUserTemplate, sendTemplateMsg, updateUserTemplate } from '@/api/templateApi';
 import { getUserTemplateList } from '@/api/messageApi';
 import { UserInfo } from "@/utils/Settings";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
@@ -16,12 +16,16 @@ import { setSessionUserInfo } from '@/utils/Storage';
 const router = useRouter();
 const templateTitle = ref<string>('');
 const templateElement = ref<string>('');
+const firstSearch = ref<boolean>(true);
+const isEdit = ref<boolean>(false);
+const editValue = ref<TemplateHistory>({});
 const reportName = ref<number>(0);
 const elementsArr = reactive<any[]>([]);
 const headersArr = reactive<HeadersArrInfo[]>([]);
 const commonTemplate = ref<TemplateInfo>({});
 const previewTemplate = ref<TemplateHistory>({});
 const TemplateList = reactive<TemplateInfo[]>([]);
+const templateMessageData = useState<any>('templateMessageData', () => {});
 
 const getTempList = async () => {
   try {
@@ -31,8 +35,7 @@ const getTempList = async () => {
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       TemplateList.push(...result.data);
-      reportName.value = TemplateList[0].nid as number;
-      refreshTemplate(TemplateList[0]);
+      getLastReport();
     }
   } catch (error) {
   }
@@ -43,29 +46,38 @@ const getLastReport = async () => {
     const info: TemplateHistory = {};
     info.content = '';
     info.userId = UserInfo.userId;
-    info.templateId = reportName.value;
     info.iPageCount = 20;
     info.iStart = 0;
-    const res: any = await getUserTemplateList(info);
-    let result = JSON.parse(res.data.value);
-    if (!result.error) {
-      if (result.data.length === 0) {
-        ShowAlert(CommonAlert.NO_LAST_MSG, 1)
+    if (firstSearch.value) {
+      const res: any = await getUserTemplateList(info);
+      let result = JSON.parse(res.data.value);
+      if (isEdit.value) {
+        TemplateList.forEach(data => {
+          if (data.name === editValue.value.templateName) {
+            reportName.value = data.nid as number;
+            refreshTemplate(data);
+          }
+        })
+        getReportContent(editValue.value?.content as string);
+      } else {
+        TemplateList.forEach(data => {
+          if (data.name === result.data[0].templateName) {
+            reportName.value = data.nid as number;
+            refreshTemplate(data);
+          }
+        })
       }
-      const historyMsg = JSON.parse(result.data[0].content);
-      elementsArr.forEach((data, index) => {
-        for (let i = 0; i < historyMsg[index].list.length - 1; i++) {
-          if (data.headersArr.length < historyMsg[index].list.length)
-            data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
+      firstSearch.value = false;
+    } else {
+      info.templateId = reportName.value;
+      const res: any = await getUserTemplateList(info);
+      let result = JSON.parse(res.data.value);
+      if (!result.error) {
+        if (result.data.length === 0) {
+          ShowAlert(CommonAlert.NO_LAST_MSG, 1)
         }
-      });
-      elementsArr.forEach((data, index) => {
-        data.headersArr.forEach((arr: HeadersArrInfo[], key: number) => {
-          arr.forEach((ele, id) => {
-            ele.inputValue = historyMsg[index].list[key][id];
-          });
-        });
-      });
+        getReportContent(result.data[0].content)
+      }
     }
   } catch (error) {
   }
@@ -97,12 +109,34 @@ const saveReport = async () => {
   }
 };
 
+const updateTemplate = async () => {
+  try {
+    setWaiting();
+    console.log(createReport().content)
+    const info: TemplateHistory = {};
+    info.nid = editValue.value?.nid;
+    info.content = createReport().content;
+    const res: any = await updateUserTemplate(info);
+    let result = JSON.parse(res.data.value);
+    if (!result.error) {
+      removeWaiting();
+      ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) });
+    }
+  } catch (error) {
+  }
+}
+
 onMounted(() => {
   const urlString = new URL(window.location.href);
   const userSession: any = {};
   userSession.id = urlString.searchParams.get('userId');
   if (userSession.id) {
     setSessionUserInfo(userSession);
+  }
+  editValue.value = templateMessageData.value;
+  templateMessageData.value = null;
+  if (editValue.value) {
+    isEdit.value = true;
   }
   getTempList();
 })
@@ -127,6 +161,10 @@ function onBtnSendClickHandler() {
   }
 }
 
+function onBtnSaveClickHandler() {
+  updateTemplate();
+}
+
 function onBtnBackClickHandler() {
   router.push({ path: '/messageMain' });
 }
@@ -141,6 +179,23 @@ function onBtnAddLineClickHandler(arr: HeadersArrInfo[]) {
 
 function onBtnDeleteLineClickHandler(arr: HeadersArrInfo[], index: number) {
   arr.splice(index, 1);
+}
+
+function getReportContent(msgInfo: string) {
+  const historyMsg = JSON.parse(msgInfo);
+  elementsArr.forEach((data, index) => {
+    for (let i = 0; i < historyMsg[index].list.length - 1; i++) {
+      if (data.headersArr.length < historyMsg[index].list.length)
+        data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
+    }
+  });
+  elementsArr.forEach((data, index) => {
+    data.headersArr.forEach((arr: HeadersArrInfo[], key: number) => {
+      arr.forEach((ele, id) => {
+        ele.inputValue = historyMsg[index].list[key][id];
+      });
+    });
+  });
 }
 
 function createReport() {
@@ -173,10 +228,10 @@ function refreshTemplate(info: TemplateInfo) {
   elementsArr.length = 0;
   headersArr.length = 0;
   commonTemplate.value = info;
-  templateTitle.value = info.title as string;
-  templateElement.value = info.element as string;
-  elementsArr.push(...JSON.parse(info.element as string));
-  headersArr.push(...JSON.parse(info.title as string));
+  templateTitle.value = info?.title as string;
+  templateElement.value = info?.element as string;
+  elementsArr.push(...JSON.parse(info?.element as string));
+  headersArr.push(...JSON.parse(info?.title as string));
   headersArr.forEach((data) => {
     data.inputValue = '';
     data.type = (data.type as string).split(',');
@@ -203,14 +258,12 @@ function onBtnPreviewClickHandler() {
   <client-only>
     <div class="header">
       <div class="tabs">
-        <el-tabs v-model="reportName" type="card" @tab-click="onBtnTabChangeClickHandler">
+        <el-tabs v-if="!isEdit" v-model="reportName" type="card" @tab-click="onBtnTabChangeClickHandler">
           <el-tab-pane v-for="(item, index) in TemplateList" :key="index" :label="item.name" :name="item.nid" />
         </el-tabs>
       </div>
       <div class="right-btn">
         <Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button>
-        <!-- <Button class='btn-icon' @click="onBtnFillUpClickHandler">填充上次消息</Button> -->
-        <!-- <Button class='btn-icon' @click="onBtnSendClickHandler">发送</Button> -->
       </div>
     </div>
     <div class="main-flex">
@@ -244,14 +297,15 @@ function onBtnPreviewClickHandler() {
         </div>
       </div>
       <div class='transform-btn-location'>
-        <div>
+        <div v-if="!isEdit">
           <Button class='btn-icon operate-btn' @click="onBtnFillUpClickHandler">填充上次消息</Button>
         </div>
         <div>
           <Button class='btn-icon operate-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
         </div>
         <div>
-          <Button class='btn-icon operate-btn' @click="onBtnSendClickHandler">发送</Button>
+          <Button v-if="isEdit" class='btn-icon operate-btn' @click="onBtnSaveClickHandler">保存</Button>
+          <Button v-else class='btn-icon operate-btn' @click="onBtnSendClickHandler">发送</Button>
         </div>
       </div>
       <div class="preview-border">

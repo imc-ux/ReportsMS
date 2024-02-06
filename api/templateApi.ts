@@ -27,7 +27,11 @@ const sendTemplateMsg = (params: any) => {
 
 const getUserActivePermission = (params: any) => {
   return httpRequest.get(service.GetUserActivePermission, params);
-}
+};
+
+const updateUserTemplate = (params: any) => {
+  return httpRequest.get(service.UpdateUserTemplate, params);
+};
 
 export {
   createTemplate,
@@ -37,4 +41,5 @@ export {
   createUserTemplate,
   sendTemplateMsg,
   getUserActivePermission,
+  updateUserTemplate,
 };
