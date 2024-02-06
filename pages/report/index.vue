@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive } from 'vue';
-import { useRouter } from 'nuxt/app';
+import { useRouter, useState } from 'nuxt/app';
 import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
 import { Plus, CloseBold } from "@element-plus/icons-vue";
 import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "@/vo";
@@ -417,11 +417,11 @@ function onBtnPreviewClickHandler() {
 }
 
 .operate-btn {
-  margin:0rem auto 0.5rem auto;
+  margin: 0rem auto 0.5rem auto;
   display: block;
 }
 
 .operate-btn:hover {
-  margin:0rem auto 0.5rem auto;
+  margin: 0rem auto 0.5rem auto;
 }
 </style>
