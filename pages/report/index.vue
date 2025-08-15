@@ -2,7 +2,7 @@
 import { onMounted, ref, reactive } from 'vue';
 import { useRouter, useState } from 'nuxt/app';
 import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
-import { Plus, CloseBold } from "@element-plus/icons-vue";
+import { Plus } from "@element-plus/icons-vue";
 import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "@/vo";
 import { CommonAlert } from '@/constant/alert/base';
 import { ShowAlert } from '@/components/alert';
@@ -12,6 +12,9 @@ import { getUserTemplateList } from '@/api/messageApi';
 import { UserInfo } from "@/utils/Settings";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 import { setSessionUserInfo } from '@/utils/Storage';
+import { VueDraggable } from 'vue-draggable-plus';
+import TemplateMessage from '@/components/TemplateMessage.vue';
+import Storage from '@/utils/Storage';
 
 const router = useRouter();
 const templateTitle = ref<string>('');
@@ -25,7 +28,9 @@ const headersArr = reactive<HeadersArrInfo[]>([]);
 const commonTemplate = ref<TemplateInfo>({});
 const previewTemplate = ref<TemplateHistory>({});
 const TemplateList = reactive<TemplateInfo[]>([]);
-const templateMessageData = useState<any>('templateMessageData', () => {});
+const templateMessageData = useState<any>('templateMessageData', () => { });
+
+const trash = ref<any[]>([]);
 
 const getTempList = async () => {
   try {
@@ -90,7 +95,11 @@ const sendTemplate = async (nid: number) => {
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       removeWaiting();
-      ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) })
+      if (!isEdit) {
+        ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) })
+      } else {
+        ShowAlert(CommonAlert.EDIT_DATA_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) });
+      }
     }
   } catch (error) {
   }
@@ -112,21 +121,23 @@ const saveReport = async () => {
 const updateTemplate = async () => {
   try {
     setWaiting();
-    console.log(createReport().content)
     const info: TemplateHistory = {};
-    info.nid = editValue.value?.nid;
+    info.nid = editValue.value?.nid as number;
     info.content = createReport().content;
     const res: any = await updateUserTemplate(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       removeWaiting();
-      ShowAlert(CommonAlert.SAVE_DATA_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) });
+      sendTemplate(info.nid)
     }
   } catch (error) {
   }
 }
 
 onMounted(() => {
+  let currentTheme = Storage.getLocalItem("svelte-theme") ?? "ux-green-light";
+  document.documentElement.setAttribute('data-bs-theme', currentTheme);
+  window.addEventListener("message", themeChangeHandler, false);
   const urlString = new URL(window.location.href);
   const userSession: any = {};
   userSession.id = urlString.searchParams.get('userId');
@@ -140,6 +151,12 @@ onMounted(() => {
   }
   getTempList();
 })
+
+function themeChangeHandler(e: MessageEvent) {
+  if (e.data.type === "theme-changed") {
+    document.documentElement.setAttribute("data-bs-theme", e.data.data);
+  }
+}
 
 function onBtnSendClickHandler() {
   try {
@@ -166,7 +183,7 @@ function onBtnSaveClickHandler() {
 }
 
 function onBtnBackClickHandler() {
-  router.push({ path: '/messageMain' });
+  router.push({ path: '/messageMain', query: { type: 'search' } });
 }
 
 function onBtnFillUpClickHandler() {
@@ -175,10 +192,6 @@ function onBtnFillUpClickHandler() {
 
 function onBtnAddLineClickHandler(arr: HeadersArrInfo[]) {
   arr.push(JSON.parse(JSON.stringify(headersArr)));
-}
-
-function onBtnDeleteLineClickHandler(arr: HeadersArrInfo[], index: number) {
-  arr.splice(index, 1);
 }
 
 function getReportContent(msgInfo: string) {
@@ -193,6 +206,7 @@ function getReportContent(msgInfo: string) {
     data.headersArr.forEach((arr: HeadersArrInfo[], key: number) => {
       arr.forEach((ele, id) => {
         ele.inputValue = historyMsg[index].list[key][id];
+        ele.selectedType = historyMsg[index].selectedType[key][id];
       });
     });
   });
@@ -206,16 +220,21 @@ function createReport() {
   elementsArr.forEach(data => {
     const contentInfo: SendMsgInfo = {};
     const listsArr: string[][] = [];
+    const typesArr: string[][] = [];
     contentInfo.type = data.value;
     data.headersArr.forEach((arr: HeadersArrInfo[]) => {
       const inputValueArr: string[] = [];
+      const inputSelectedTypeArr: string[] = [];
       arr.forEach(info => {
         inputValueArr.push(info.inputValue as string);
+        inputSelectedTypeArr.push(info.selectedType as string);
       });
-      listsArr.push(inputValueArr)
+      listsArr.push(inputValueArr);
+      typesArr.push(inputSelectedTypeArr);
     });
     contentInfo.list = listsArr;
-    sendContent.push(contentInfo)
+    contentInfo.selectedType = typesArr;
+    sendContent.push(contentInfo);
   });
   info.content = JSON.stringify(sendContent);
   info.templateTitle = templateTitle.value;
@@ -269,31 +288,32 @@ function onBtnPreviewClickHandler() {
     <div class="main-flex">
       <div class="content-border">
         <div v-for="(part, index) in elementsArr" :key="index">
-          <div>
+          <div style="display: flex;">
             <div class="reoprt-element-text">
               <el-text>{{ part.value }}</el-text>
             </div>
+            <Button class='add-types-btn' :btnIcon="Plus" @click="onBtnAddLineClickHandler(part.headersArr)"></Button>
           </div>
-          <div v-for="(content, index) in part.headersArr" :key="index" class="section-border">
-            <div v-for="(unit, indexs) in content" :key="indexs" class="content-format">
-              <div class="background_gray_border left_box content-format-com" horizontalAlign="left">
-                <el-text class="left_text">{{ `${unit.value}${index + 1}` }}</el-text>
+          <VueDraggable v-model="part.headersArr" forceFallback
+            :group="{ name: 'report', pull: part.headersArr.length > 1 }" ghostClass="ghost" delay="300">
+            <div v-for="(content, index) in part.headersArr" :key="index" class="section-border">
+              <div v-for="(unit, indexs) in content" :key="indexs" class="content-format-title" v-show="indexs === 0">
+                <div class="content-format-com box-top-right" style="margin: 0.0625rem 0rem; height: 32px">
+                  <el-input v-model="unit.inputValue" :placeholder="unit.value" />
+                </div>
               </div>
-              <div class="content-format-com box-top-right">
-                <el-input v-if="unit.selectedType === 'input'" v-model="unit.inputValue" />
-                <el-input v-if="unit.selectedType === 'batchInput'" v-model="unit.inputValue"
-                  :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" />
-                <el-select class="component-select" v-model="unit.selectedType" :disabled="unit.type.length === 1">
-                  <el-option class="options" v-for="item in unit.type" :key="item" :label="item" :value="item" />
-                </el-select>
+              <div v-for="(unit, indexs) in content" :key="indexs" class="content-format" v-show="indexs > 0">
+                <div class="content-format-com box-top-right">
+                  <el-input v-if="unit.selectedType === 'input'" v-model="unit.inputValue" :placeholder="unit.value" />
+                  <el-input v-if="unit.selectedType === 'batchInput'" v-model="unit.inputValue"
+                    :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" :placeholder="unit.value" />
+                  <el-select class="component-select" v-model="unit.selectedType" :disabled="unit.type.length === 1">
+                    <el-option class="options" v-for="item in unit.type" :key="item" :label="item" :value="item" />
+                  </el-select>
+                </div>
               </div>
-              <Button v-if="indexs === 0 && index > 0" class='delete-btn' :btnIcon="CloseBold"
-                @click="onBtnDeleteLineClickHandler(part.headersArr, index)"></Button>
-              <div v-else class='delete-btn-holder' />
             </div>
-            <Button v-if="index === (part.headersArr.length - 1)" class='add-types-btn' :btnIcon="Plus"
-              @click="onBtnAddLineClickHandler(part.headersArr)"></Button>
-          </div>
+          </VueDraggable>
         </div>
       </div>
       <div class='transform-btn-location'>
@@ -304,12 +324,14 @@ function onBtnPreviewClickHandler() {
           <Button class='btn-icon operate-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
         </div>
         <div>
-          <Button v-if="isEdit" class='btn-icon operate-btn' @click="onBtnSaveClickHandler">保存</Button>
+          <Button v-if="isEdit" class='btn-icon operate-btn' @click="onBtnSaveClickHandler">发送</Button>
           <Button v-else class='btn-icon operate-btn' @click="onBtnSendClickHandler">发送</Button>
         </div>
+        <VueDraggable class="drag-box" v-model="trash" group="report" disabled ghostClass="ghost">
+        </VueDraggable>
       </div>
       <div class="preview-border">
-        <MarkDownTable :templeteAr="previewTemplate" />
+        <TemplateMessage :templeteAr="previewTemplate" />
       </div>
     </div>
   </client-only>
@@ -333,13 +355,16 @@ function onBtnPreviewClickHandler() {
 }
 
 .section-border {
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   margin: 0 0.3125rem 0.1875rem;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .content-format {
   display: flex;
   margin: 0.0625rem;
+  flex-grow: 20;
 }
 
 .content-format-com {
@@ -347,10 +372,16 @@ function onBtnPreviewClickHandler() {
   line-height: 1.75rem;
 }
 
+.content-format-title {
+  display: flex;
+  line-height: 1.75rem;
+  margin-left: 0.0625rem;
+}
+
 .background_gray_border {
-  color: #fff;
-  border-top: 0.0625rem solid #cacaca;
-  border-bottom: 0.0625rem solid #cacaca;
+  color: var(--iux-theme-font-color);
+  border-top: var(--iux-agGrid-border);
+  border-bottom: var(--iux-agGrid-border);
   border-collapse: collapse;
   text-align: center;
 }
@@ -360,14 +391,14 @@ function onBtnPreviewClickHandler() {
   justify-content: center;
   overflow: hidden;
   font-size: 0.8125rem;
-  background-color: #08ADAA;
+  background-color: var(--iux-agGrid-background-color);
 }
 
 .left_text {
   width: 100%;
   padding-left: 0.625rem;
   text-align: left;
-  color: #fff;
+  color: var(--iux-theme-font-color);
 }
 
 .box-top-right {
@@ -383,7 +414,7 @@ function onBtnPreviewClickHandler() {
 .content-border {
   min-height: 53.75rem;
   width: 40%;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   border-radius: 0;
   margin-top: 1.25rem;
   display: inline-block;
@@ -392,19 +423,18 @@ function onBtnPreviewClickHandler() {
 .add-types-btn {
   width: 1.875rem;
   height: 1.875rem;
-  margin-left: 0.0625rem;
-  margin-bottom: 0.0625rem;
+  margin: 0.5625rem 0.3125rem 0.0625rem 0.0625rem;
+  display: inline-block;
 }
 
 .add-types-btn:hover {
   width: 1.875rem;
   height: 1.875rem;
-  margin-left: 0.0625rem;
-  margin-bottom: 0.0625rem;
+  margin: 0.5625rem 0.3125rem 0.0625rem 0.0625rem;
 }
 
 .add-types-btn>span>i {
-  margin-left: 0rem;
+  margin-left: -0.375rem;
 }
 
 .transform-btn-location {
@@ -420,14 +450,14 @@ function onBtnPreviewClickHandler() {
 .preview-border {
   height: 53.75rem;
   width: 40%;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   border-radius: 0;
   margin-top: 1.25rem;
   display: inline-block;
 }
 
 .reoprt-element-text {
-  color: #000;
+  color: var(--iux-theme-font-color);
   font-size: 1rem;
   font-weight: 600;
   font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
@@ -477,5 +507,9 @@ function onBtnPreviewClickHandler() {
 
 .operate-btn:hover {
   margin: 0rem auto 0.5rem auto;
+}
+
+.drag-box {
+  height: 100%;
 }
 </style>

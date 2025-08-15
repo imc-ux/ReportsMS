@@ -9,6 +9,7 @@ import { ShowAlert } from '@/components/alert';
 import { createTemplate, updateTemplate, getUserActivePermission } from '@/api/templateApi';
 import { UserInfo } from "@/utils/Settings";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
+import TemplateMessage from '@/components/TemplateMessage.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -96,7 +97,7 @@ onMounted(() => {
 })
 
 function initTemplate() {
-  title.value = route.query.name;
+  title.value = route.query.name ?? '';
   const tempTitleArr = JSON.parse(route.query.title)
   const tempElementArr = JSON.parse(route.query.element)
   tempTitleArr.forEach((data: HeadersArrInfo) => {
@@ -239,7 +240,7 @@ function onBtnPreviewClickHandler() {
         <Button class='btn-icon transform-btn' @click="onBtnPreviewClickHandler">预览模板</Button>
       </div>
       <div class="preview-border">
-        <MarkDownTable :templeteAr="previewTemplate" />
+        <TemplateMessage :templeteAr="previewTemplate" />
       </div>
     </div>
   </client-only>
@@ -247,7 +248,7 @@ function onBtnPreviewClickHandler() {
 
 <style>
 .split-line {
-  border-bottom: 0.0625rem solid #cacaca;
+  border-bottom: var(--iux-agGrid-border);
 }
 
 .non-init-button {
@@ -257,7 +258,7 @@ function onBtnPreviewClickHandler() {
 .content-border {
   height: 53.75rem;
   width: 40%;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   border-radius: 0;
   margin-top: 1.25rem;
   display: inline-block;
@@ -355,7 +356,7 @@ function onBtnPreviewClickHandler() {
 .preview-border {
   height: 53.75rem;
   width: 40%;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   border-radius: 0;
   margin-top: 1.25rem;
   display: inline-block;

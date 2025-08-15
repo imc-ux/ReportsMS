@@ -1,6 +1,6 @@
 {
   "name": "ReportsMS",
-  "version": "1.0.3",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -23,11 +23,13 @@
     "@nuxt/typescript": "^2.8.1",
     "@nuxt/typescript-build": "^3.0.2",
     "@nuxt/typescript-runtime": "^3.0.2",
+    "@nuxtjs/bootstrap": "^0.0.1",
     "@syncfusion/ej2-vue-charts": "^24.1.46",
     "@types/node": "^20.10.4",
     "@types/prettier": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
+    "bootstrap": "^5.3.7",
     "date-fns": "^3.0.6",
     "element-plus": "^2.4.3",
     "eslint": "^8.55.0",
@@ -35,6 +37,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-vue": "^9.19.2",
     "md-editor-v3": "^4.9.0",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "vue-draggable-plus": "^0.5.2"
   }
 }

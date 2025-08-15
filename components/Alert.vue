@@ -4,6 +4,7 @@ import icon_delete from '../public/images/alert_icon_delete.png';
 import icon_question from '../public/images/alert_icon_question.png';
 import icon_succeed from '../public/images/alert_icon_succeed.png';
 import icon_warning from '../public/images/alert_icon_warning.png';
+
 import { ref } from 'vue';
 
 const alertVisible = ref(true);
@@ -40,8 +41,8 @@ export default {
 </script>
 
 <template>
-    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="19.6875rem" draggable
-        align-center>
+    <el-dialog :model-value="alertVisible" :show-close="false" :close-on-click-modal="false" width="19.6875rem"
+        draggable align-center>
         <div class="alert-content">
             <div v-if="icon === 0" class="icon-box">
                 <el-image class="image-width-style" :src="icon_succeed" :fit="'fill'" />
@@ -78,31 +79,6 @@ export default {
     height: 2.5rem
 }
 
-.el-dialog__header {
-    height: 1.75rem;
-    background-color: #08adaa;
-    padding: 0rem;
-    margin: 0rem;
-}
-
-.alert-button {
-    width: 4.125rem;
-    height: 1.5rem;
-    font-size: 0.8125rem;
-    margin: auto;
-    background-color: #08adaa;
-    color: #fff;
-}
-
-.alert-button:hover {
-    width: 4.125rem;
-    height: 1.5rem;
-    font-size: 0.8125rem;
-    margin: auto;
-    background-color: #08adaa;
-    color: #fff;
-}
-
 .el-dialog__footer {
     height: 2.5rem;
     padding: 0rem;
@@ -116,13 +92,6 @@ export default {
     min-height: 4.375rem;
     width: auto;
     padding: 0rem 0.9375rem;
-}
-
-.alert-message {
-    margin-left: 1.25rem;
-    font-size: 0.875rem;
-    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
-    color: #000;
 }
 
 .el-dialog__body {

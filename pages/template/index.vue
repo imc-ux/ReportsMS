@@ -9,6 +9,7 @@ import { ShowAlert } from '@/components/alert';
 import { getTemplateList, deleteTemplate, getUserActivePermission } from '@/api/templateApi';
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
 import { UserInfo } from "@/utils/Settings";
+import Storage from '@/utils/Storage';
 
 const router = useRouter();
 const title = ref<string>('');
@@ -64,9 +65,18 @@ const deleteTempList = async () => {
 };
 
 onMounted(() => {
+  let currentTheme = Storage.getLocalItem("svelte-theme") ?? "ux-green-light";
+  document.documentElement.setAttribute('data-bs-theme', currentTheme);
+  window.addEventListener("message", themeChangeHandler, false);
   getTempList();
   getUserPermission();
 })
+
+function themeChangeHandler(e: MessageEvent) {
+  if (e.data.type === "theme-changed") {
+    document.documentElement.setAttribute("data-bs-theme", e.data.data);
+  }
+}
 
 function onBtnSearchClickHandler() {
   getTempList();
@@ -142,6 +152,7 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 
 .page-name>span {
   font-size: x-large;
+  color: var(--iux-theme-font-color);
 }
 
 .main-title-text {
@@ -168,7 +179,7 @@ function onBtnDeleteClickHandler(row: TemplateInfo) {
 .search-condition {
   display: flex;
   height: 2.5rem;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   padding-top: 0.625rem;
 }
 
