@@ -1,4 +1,15 @@
 /* 全局css */
+body {
+  font-family:
+    "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
+  background: var(--iux-agGrid-background-color);
+  color: var(--iux-theme-font-color) !important;
+}
+
+:root {
+  --el-color-primary: var(--iux-theme-font-color);
+}
+
 .main-flex {
   display: flex;
   min-width: 71.875rem;
@@ -8,11 +19,11 @@
   width: 0rem;
 }
 .title-text {
-  color: #000;
+  color: var(--iux-theme-font-color);
   font-size: 1rem;
   font-weight: 600;
-  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
-    "微软雅黑";
+  font-family:
+    "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
   margin: 0.625rem;
   width: 2.5rem;
   height: 1.875rem;
@@ -25,15 +36,15 @@
 }
 .split {
   display: flex;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   height: auto;
   padding-top: 0.625rem;
   padding-bottom: 0.625rem;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 .split-line {
-  border-bottom: 0.0625rem solid #cacaca;
+  border-bottom: var(--iux-agGrid-border);
 }
 .non-init-button {
   margin-left: 0.1875rem;
@@ -99,7 +110,7 @@
 .preview-border {
   height: 56.25rem;
   width: 40%;
-  border: 0.0625rem solid #cacaca;
+  border: var(--iux-agGrid-border);
   border-radius: 0;
   margin-top: 1.25rem;
   display: inline-block;

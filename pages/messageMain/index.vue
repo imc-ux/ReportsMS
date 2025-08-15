@@ -1,15 +1,17 @@
 <script lang="ts" setup>
-import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElCheckbox } from 'element-plus';
+import { ElDatePicker, ElSelect, ElOption, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElCheckbox, ElConfigProvider } from 'element-plus';
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute, useState } from 'nuxt/app';
 import { getUserList, getTemplateList, getUserTemplateList, deleteUserTemplate, getUserActivePermission, updateUserTemplate } from '@/api/messageApi';
 import { TemplateHistory } from '@/vo';
 import { ShowAlert } from '@/components/alert';
 import { CommonAlert } from '@/constant/alert/base';
-import MarkDownTable from '@/components/MarkDownTable.vue';
-import { format, subWeeks } from "date-fns";
+import { format, subWeeks, addDays } from "date-fns";
 import { UserInfo } from "@/utils/Settings";
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
+import { zhCn } from 'element-plus/es/locale';
+import TemplateMessage from '@/components/TemplateMessage.vue';
+import Storage from '@/utils/Storage';
 
 const router = useRouter();
 const route = useRoute();
@@ -34,6 +36,7 @@ const checkedN = ref<boolean>(true);
 const showDeleteBtn = ref<boolean>(false);
 const updateFlag = ref<boolean>(false);
 const deleteInfo = ref<any>({});
+const autoSearch = ref<boolean>(false);
 const templateMessageData = useState<any>('templateMessageData', () => { });
 
 const updatePageTemplate = async () => {
@@ -75,13 +78,13 @@ const getUserPermission = async () => {
         const res: any = await getUserActivePermission(userId);
         let result = JSON.parse(res.data.value);
         if (!result.error) {
-            overCount();
             userPermission.value = result.data;
             if (userPermission.value.indexOf('T_B') >= 0) {
                 dateValue.value = [new Date(), new Date()];
             } else {
-                dateValue.value = [subWeeks(new Date(), 1), new Date()];
+                dateValue.value = [addDays(subWeeks(new Date(), 1), 1), new Date()];
             }
+            overCount();
         }
     } catch (error) {
 
@@ -152,6 +155,9 @@ const searchInfo = async () => {
         let result = JSON.parse(res.data.value);
         if (!result.error) {
             overCount();
+            result.data?.forEach((elem: any) => {
+                elem.createTimes = elem.createTime?.substring(0, 19);
+            })
             tableData.value = result.data;
             if (result.data && result.data.length > 0) {
                 totalCount.value = (Number)(result.data[0].totalCount);
@@ -181,18 +187,24 @@ const deleteTemplate = async () => {
 }
 
 onMounted(() => {
+    let currentTheme = Storage.getLocalItem("svelte-theme") ?? "ux-green-light";
+    document.documentElement.setAttribute('data-bs-theme', currentTheme);
+    window.addEventListener("message", themeChangeHandler, false);
+    count.value = 3;
     if (route.query?.type === 'search') {
-        count.value = 4;
-        iPage.value = 1;
-        searchInfo();;
-    } else {
-        count.value = 3;
+        autoSearch.value = true;
     }
     userList();
     templateList();
     getUserPermission();
     setWaiting();
 });
+
+function themeChangeHandler(e: MessageEvent) {
+    if (e.data.type === "theme-changed") {
+        document.documentElement.setAttribute("data-bs-theme", e.data.data);
+    }
+}
 
 function deletePageHandler() {
     showIndex.value = true;
@@ -211,14 +223,21 @@ function overCount() {
     count.value--;
     if (count.value === 0) {
         removeWaiting();
+        if (autoSearch.value) {
+            autoSearch.value = false;
+            count.value = 1;
+            iPage.value = 1;
+            setWaiting();
+            searchInfo();
+        }
     }
 }
 
 function onSearchHandlerClick() {
     count.value = 1;
     iPage.value = 1;
-    searchInfo();
     setWaiting();
+    searchInfo();
 }
 
 function onResetHandlerClick() {
@@ -306,6 +325,14 @@ function deleteFlagNHandler() {
     }
 }
 
+function onSelectDateClick() {
+    if (Number(selectedModel.value) === 4) {
+        dateValue.value = [addDays(subWeeks(new Date(), 1), 1), new Date()];
+    } else if (Number(selectedModel.value) === 1) {
+        dateValue.value = [new Date(), new Date()];
+    }
+}
+
 </script>
 <template>
     <client-only>
@@ -318,17 +345,20 @@ function deleteFlagNHandler() {
                     <div class="box-width-80">
                         <span>发送时间</span>
                     </div>
-                    <div class="box-width-380">
-                        <el-date-picker v-model="dateValue" type="daterange" range-separator="~">
-                        </el-date-picker>
+                    <div class="box-width-260">
+                        <el-config-provider :locale="zhCn">
+                            <el-date-picker v-model="dateValue" type="daterange" range-separator="~">
+                            </el-date-picker>
+                        </el-config-provider>
                     </div>
                 </div>
                 <div class="box-display-grow">
-                    <div class="box-width-80">
+                    <div class="box-margin-width-100">
                         <span>模板类型</span>
                     </div>
                     <div class="box-flex-margin">
-                        <el-select v-model="selectedModel" placeholder="请选择" :clearable="clearable">
+                        <el-select v-model="selectedModel" placeholder="请选择" :clearable="clearable"
+                            @change="onSelectDateClick">
                             <el-option v-for="item in modelTypes" :key="item.nid" :label="item.name" :value="item.nid">
                             </el-option>
                         </el-select>
@@ -353,7 +383,7 @@ function deleteFlagNHandler() {
                         <el-input v-model="inputMessage" placeholder="请输入内容"></el-input>
                     </div>
                 </div>
-                <div class="box-display-grow">
+                <div class="box-display-width-210">
                     <div class="box-margin-width-100">
                         <span>删除与否</span>
                     </div>
@@ -375,9 +405,9 @@ function deleteFlagNHandler() {
             </div>
             <div>
                 <el-table :data="tableData" border class="width-max" max-height="800">
-                    <el-table-column header-align="center" align="center" prop="templateName" label="模板类型" />
+                    <el-table-column eader-align="center" align="center" prop="templateName" label="模板类型" />
                     <el-table-column header-align="center" align="center" prop="userName" label="发送人" />
-                    <el-table-column header-align="center" align="center" prop="createTime" label="发送时间" />
+                    <el-table-column header-align="center" align="center" prop="createTimes" label="发送时间" />
                     <el-table-column header-align="center" align="center" label="操作">
                         <template #default="scope">
                             <el-button type="text" size="small"
@@ -386,6 +416,11 @@ function deleteFlagNHandler() {
                                 @click="onTabelDeleteHandler(scope.$index, scope.row)">删除</el-button>
                             <el-button v-if="scope.row.isDelete === 'Y'" type="text" size="small"
                                 @click="onTabelResoreHandler(scope.$index, scope.row)">恢复</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="200" label="内容" type="expand">
+                        <template #default="scope">
+                            <TemplateMessage :templeteAr="scope.row" />
                         </template>
                     </el-table-column>
                 </el-table>
@@ -405,7 +440,7 @@ function deleteFlagNHandler() {
                 <Button class='btn-icon' @click="onReturnClickHandler">返回</Button>
             </div>
             <div height="100%" class="split">
-                <MarkDownTable :templeteAr="templateData" />
+                <TemplateMessage :templeteAr="templateData" />
             </div>
         </div>
     </client-only>
@@ -420,6 +455,7 @@ function deleteFlagNHandler() {
 
 .font-size-large {
     font-size: x-large;
+    color: var(--iux-theme-font-color);
 }
 
 .box-top {
@@ -437,23 +473,25 @@ function deleteFlagNHandler() {
 .box-display-item {
     display: flex;
     height: 2.5rem;
-    border: 0.0625rem solid #cacaca;
+    border: var(--iux-agGrid-border);
     align-items: center;
 }
 
 .box-width {
     display: flex;
-    width: 30rem;
+    width: 22.5rem;
 }
 
 .box-width-80 {
     width: 5rem;
     margin-left: 0.3125rem;
     margin-top: 0.25rem;
+    color: var(--iux-theme-font-color);
 }
 
-.box-width-380 {
-    width: 23.75rem;
+.box-width-260 {
+    width: 18rem;
+    color: var(--iux-theme-font-color);
 }
 
 .box-flex-margin {
@@ -467,16 +505,31 @@ function deleteFlagNHandler() {
     flex-grow: 1;
 }
 
+.box-display-width-210 {
+    display: flex;
+    width: 13.75rem;
+    color: var(--iux-theme-font-color);
+}
+
 .box-margin-width-64 {
     width: 4rem;
-    margin-left: 1.25rem;
-    margin-top: 0.25rem
+    margin-left: 0.31rem;
+    margin-top: 0.25rem;
+    color: var(--iux-theme-font-color);
+}
+
+.box-margin-width-80 {
+    width: 5rem;
+    margin-left: 0.31rem;
+    margin-top: 0.25rem;
+    color: var(--iux-theme-font-color);
 }
 
 .box-margin-width-100 {
-    width: 6.25rem;
-    margin-left: 1.25rem;
-    margin-top: 0.25rem
+    width: 6.5rem;
+    margin-left: 0.31rem;
+    margin-top: 0.25rem;
+    color: var(--iux-theme-font-color);
 }
 
 .margin-left-right {
@@ -514,11 +567,15 @@ function deleteFlagNHandler() {
 }
 
 .el-checkbox__input.is-checked .el-checkbox__inner {
-    background-color: #08adaa;
-    border-color: #08adaa;
+    background-color: var(--iux-checkbox-checked-bg);
+    border-color: var(--iux-border-color);
 }
 
 .el-checkbox__input.is-checked+.el-checkbox__label {
-    color: #303133;
+    color: var(--iux-theme-font-color);
+}
+
+.el-select-dropdown__item.hover {
+    background-color: var(--iux-theme-disabled-select-color) !important;
 }
 </style>

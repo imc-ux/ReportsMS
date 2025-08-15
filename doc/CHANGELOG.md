@@ -1,14 +1,36 @@
-## [V1.0.3](https://github.com/imc-ux/ReportsMS/releases/tag/v1.0.3) (2024-2-6)
+## [V1.0.7](http://109.14.20.46:8099/ux/ReportsMS/-/releases/v1.0.7) (2024-7-22)
 
 ### Features
 
-- 主要issue54 51 50问题修正
+- 无
 
 ### Bug Fixes
 
-- #54 模板列表显示顺序问题修正
-- #51 主要新增删除与否以及恢复功能
-- #50 查看消息增加修改与发送功能
+- #72 检索结果增加内容列，和检索条件的内容呼应
+
+## [V1.0.6](http://109.14.20.46:8099/ux/ReportsMS/-/releases/v1.0.6) (2024-7-18)
+
+### Features
+
+- 无
+
+### Bug Fixes
+
+- #65
+- #72 检索结果 发送时间格式不正确
+- #72 整体页面没有设置字体，需要明文设定字体
+
+## [V1.0.5](http://109.14.20.46:8099/ux/ReportsMS/-/releases/v1.0.5) (2024-7-16)
+
+### Features
+
+- #71
+
+### Bug Fixes
+
+- #60
+- #68
+- #70
 
 ## [V1.0.2](https://github.com/imc-ux/ReportsMS/releases/tag/v1.0.2) (2024-2-1)
 

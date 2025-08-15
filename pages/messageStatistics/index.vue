@@ -3,7 +3,7 @@ import { reactive, ref, provide } from 'vue';
 import type { TabsPaneContext } from 'element-plus'
 import { ElTabs, ElTabPane, ElDatePicker, ElTable, ElTableColumn, ElLink } from 'element-plus';
 import { getTemplateList, getUserTemplateList } from '@/api/messageStaticsApi';
-import { useRouter } from 'nuxt/app';
+import { useState, useRouter } from 'nuxt/app';
 import { onMounted } from 'vue';
 import { format, subDays } from "date-fns";
 import { TemplateHistory } from '@/vo';
@@ -17,7 +17,8 @@ import {
     Tooltip,
 } from '@syncfusion/ej2-vue-charts';
 import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
-import MarkDownTable from '@/components/MarkDownTable.vue';
+import TemplateMessage from '@/components/TemplateMessage.vue';
+import Storage from '@/utils/Storage';
 
 const router = useRouter();
 const fitFlag = ref<boolean>(false);
@@ -49,8 +50,17 @@ const templateMarkData = ref<any[]>([]);
 provide('chart', [Category, Legend, Tooltip, LineSeries]);
 
 onMounted(() => {
+    let currentTheme = Storage.getLocalItem("svelte-theme") ?? "ux-green-light";
+    document.documentElement.setAttribute('data-bs-theme', currentTheme);
+    window.addEventListener("message", themeChangeHandler, false);
     templateSearchList();
 });
+
+function themeChangeHandler(e: MessageEvent) {
+    if (e.data.type === "theme-changed") {
+        document.documentElement.setAttribute("data-bs-theme", e.data.data);
+    }
+}
 
 const templateSearchList = async () => {
     try {
@@ -305,7 +315,8 @@ function onMessageHandler() {
                     <span class="span_width">时间</span>
                     <div class="tabs_flex_two">
                         <el-tabs v-model="timeCode" type="card" @tab-click="onBtnTabDateChangeClickHandler">
-                            <el-tab-pane v-for="item in timeList" :key="item.code" :label="item.name" :name="item.code" />
+                            <el-tab-pane v-for="item in timeList" :key="item.code" :label="item.name"
+                                :name="item.code" />
                         </el-tabs>
                     </div>
                     <div class="box-width-380">
@@ -314,7 +325,8 @@ function onMessageHandler() {
                     </div>
                     <div class="tabs_flex_two">
                         <el-tabs v-model="tabReportName" type="card">
-                            <el-tab-pane v-for="item in templateList" :key="item.nid" :label="item.name" :name="item.nid" />
+                            <el-tab-pane v-for="item in templateList" :key="item.nid" :label="item.name"
+                                :name="item.nid" />
                         </el-tabs>
                     </div>
                 </div>
@@ -332,22 +344,24 @@ function onMessageHandler() {
                         <ejs-chart :width='chartDivWidth' height='300' :primaryXAxis="primaryXAxis" :tooltip="tooltip"
                             :legendSettings="legendSettings">
                             <e-series-collection>
-                                <e-series v-if="tableCode === 'A'" :dataSource="seriesColumnsData" type="Line" xName="name"
-                                    yName="y1Name" :marker="marker"></e-series>
-                                <e-series v-if="tableCode === 'B'" :dataSource="seriesColumnsData" type="Line" xName="name"
-                                    yName="y2Name" :marker="marker"></e-series>
-                                <e-series v-if="tableCode === 'C'" :dataSource="seriesColumnsData" type="Line" xName="name"
-                                    yName="y3Name" :marker="marker"></e-series>
+                                <e-series v-if="tableCode === 'A'" :dataSource="seriesColumnsData" type="Line"
+                                    xName="name" yName="y1Name" :marker="marker"></e-series>
+                                <e-series v-if="tableCode === 'B'" :dataSource="seriesColumnsData" type="Line"
+                                    xName="name" yName="y2Name" :marker="marker"></e-series>
+                                <e-series v-if="tableCode === 'C'" :dataSource="seriesColumnsData" type="Line"
+                                    xName="name" yName="y3Name" :marker="marker"></e-series>
                             </e-series-collection>
                         </ejs-chart>
                         <el-table :data="tableMessageData" border :fit='fitFlag'>
-                            <el-table-column header-align="center" align="center" prop="userName" label="发送人" width="160" />
+                            <el-table-column header-align="center" align="center" prop="userName" label="发送人"
+                                width="160" />
                             <el-table-column v-for="item in titleNames" header-align="center" align="center"
                                 :prop="item.code" :label="item.name" width="160">
                                 <template #default="scope">
-                                    <el-link v-if="scope.row[item.code] > 0" class="font-size-12" href="#" type="primary"
-                                        @click="onTabelDetailHandler(scope.row, item.code)">{{
-                                            scope.row[item.code] }}</el-link>
+                                    <el-link v-if="scope.row[item.code] > 0" class="font-size-12" href="#"
+                                        type="primary" @click="onTabelDetailHandler(scope.row, item.code)">{{
+            scope.row[item.code]
+        }}</el-link>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -362,8 +376,8 @@ function onMessageHandler() {
             <div class="justify-flex-end_bottom">
                 <Button class='btn-icon' @click="onReturnClickHandler">返回</Button>
             </div>
-            <div height="100%" class="split tabs_flex_direction">
-                <MarkDownTable v-for="item in templateMarkData" :templeteAr="item" :isShowName=true />
+            <div height="100%" class="tabs_flex_direction">
+                <TemplateMessage v-for="item in templateMarkData" :templeteAr="item" :isShowName=true />
             </div>
         </div>
     </client-only>
@@ -384,20 +398,23 @@ function onMessageHandler() {
 
 .font-size-x-large {
     font-size: x-large;
+    color: var(--iux-theme-font-color);
 }
 
 .font-size-title-large {
     font-size: 1.125rem;
+    color: var(--iux-theme-font-color);
 }
 
 .font-size-large-x {
     font-size: 0.875rem;
+    color: var(--iux-theme-font-color);
 }
 
 .box-display-height-50 {
     display: flex;
     height: 3.125rem;
-    border: 0.0625rem solid #cacaca;
+    border: var(--iux-agGrid-border);
     align-items: center;
     margin-bottom: 0.3125rem;
 }
@@ -405,7 +422,7 @@ function onMessageHandler() {
 .box-display-grow_border {
     display: flex;
     flex-grow: 1;
-    border-right: 0.0625rem solid #cacaca;
+    border-right: var(--iux-agGrid-border);
     height: 3.125rem;
     flex-direction: column;
 }
@@ -437,24 +454,28 @@ function onMessageHandler() {
 .tabs_flex_direction {
     display: flex;
     flex-direction: column;
+    border: var(--iux-agGrid-border);
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
 }
 
 .span_border {
     display: flex;
     font-size: 0.875rem;
     height: 2.5rem;
-    border-top: 0.0625rem solid #cacaca;
-    border-left: 0.0625rem solid #cacaca;
+    border-top: var(--iux-agGrid-border);
     align-items: center;
     padding-left: 0.625rem;
     padding-right: 0.625rem;
+    color: var(--iux-theme-font-color);
 }
 
 .box-display_border {
     display: flex;
     width: 100%;
     height: 2.8125rem;
-    border: 0.0625rem solid #cacaca;
+    border-top: var(--iux-agGrid-border);
+    border-bottom: var(--iux-agGrid-border);
     align-items: center;
 }
 
@@ -464,15 +485,17 @@ function onMessageHandler() {
     text-align: center;
     padding-left: 0.3125rem;
     padding-right: 0.3125rem;
+    color: var(--iux-theme-font-color);
 }
 
 .tabs_flex_two {
     display: flex;
-    border-bottom: 0.0625rem solid #cacaca;
+    border-bottom: var(--iux-agGrid-border);
 }
 
 .box-width-380 {
     width: 23.75rem;
+    padding-left: 1px;
 }
 
 .margin-left {
@@ -487,12 +510,14 @@ function onMessageHandler() {
 .justify-flex {
     justify-content: flex-start;
     display: flex;
-    flex-grow: 1
+    flex-grow: 1;
+    padding-left: 1px;
 }
 
 .justify-flex-end {
     justify-content: flex-end;
     display: flex;
+    padding-right: 1px;
 }
 
 .font-size-12 {

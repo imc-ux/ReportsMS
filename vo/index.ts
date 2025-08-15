@@ -56,4 +56,5 @@ export interface TemplateHistory {
 export interface SendMsgInfo {
   list?: string[][];
   type?: string;
+  selectedType?: string[][];
 }

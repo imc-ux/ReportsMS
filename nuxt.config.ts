@@ -2,7 +2,7 @@ export default {
   title: "ReportsMS",
   devServer: {
     host: "127.0.0.1",
-    // host: "109.14.6.212",
+    //host: "109.14.6.221",
     port: 8080,
   },
   test: /\.ts$/,
@@ -56,7 +56,20 @@ export default {
     "~/assets/css/main.css",
     "~/assets/css/element.css",
     "~/assets/css/component.css",
+    { src: '~/assets/bootstrap/main.scss', lang: 'scss' },
   ],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true,
+          silenceDeprecations: ['import', 'color-functions', 'legacy-js-api', 'global-builtin'],
+          additionalData: `@use "~/assets/bootstrap/_mixin.scss" as *; @use "~/assets/bootstrap/_variables.scss" as *;`,
+        },
+      },
+    },
+  },
+
   ssr: false,
   app: {
     baseURL: "/cusys/reportsMS/",

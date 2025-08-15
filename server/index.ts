@@ -2,7 +2,7 @@ import { UseFetchOptions, useFetch } from "nuxt/app";
 
 type Methods = "GET" | "POST";
 
-const SERVER_URL = "http://109.14.20.45:6636/ux/";
+const SERVER_URL = "http://109.14.6.43:6636/ux/";
 // const SERVER_URL = "http://109.14.6.243:7777/";
 
 class HttpRequest {
@@ -14,7 +14,7 @@ class HttpRequest {
       };
       if (method === "GET") {
         if (typeof data === "string") {
-          let jsonString: any = data
+          let jsonString: any = data;
           newOptions.params = { jsonString };
         } else {
           let jsonString: any = encodeURIComponent(JSON.stringify(data));
