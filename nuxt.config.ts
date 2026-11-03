@@ -56,14 +56,19 @@ export default {
     "~/assets/css/main.css",
     "~/assets/css/element.css",
     "~/assets/css/component.css",
-    { src: '~/assets/bootstrap/main.scss', lang: 'scss' },
+    { src: "~/assets/bootstrap/main.scss", lang: "scss" },
   ],
   vite: {
     css: {
       preprocessorOptions: {
         scss: {
           quietDeps: true,
-          silenceDeprecations: ['import', 'color-functions', 'legacy-js-api', 'global-builtin'],
+          silenceDeprecations: [
+            "import",
+            "color-functions",
+            "legacy-js-api",
+            "global-builtin",
+          ],
           additionalData: `@use "~/assets/bootstrap/_mixin.scss" as *; @use "~/assets/bootstrap/_variables.scss" as *;`,
         },
       },

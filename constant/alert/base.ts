@@ -1,5 +1,6 @@
 export enum CommonAlert {
   INTERNET_ERROR = "网络错误!",
+  SOMETHING_ERROR = "发生错误!",
   EDIT_DATA_SUCCESS = "编辑成功!",
   RECOVER_DATA_SUCCESS = "恢复成功!",
   DELETE_DATA_SUCCESS = "删除成功!",
