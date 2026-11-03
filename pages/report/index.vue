@@ -1,24 +1,43 @@
 <script lang="ts" setup>
-import { onMounted, ref, reactive } from 'vue';
-import { useRouter, useState } from 'nuxt/app';
-import { ElInput, ElText, ElSelect, ElOption, ElTabs, ElTabPane } from 'element-plus';
+import { onMounted, ref, reactive } from "vue";
+import { useRouter, useState } from "nuxt/app";
+import {
+  ElInput,
+  ElText,
+  ElSelect,
+  ElOption,
+  ElTabs,
+  ElTabPane,
+} from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import { TemplateInfo, TemplateHistory, SendMsgInfo, HeadersArrInfo } from "@/vo";
-import { CommonAlert } from '@/constant/alert/base';
-import { ShowAlert } from '@/components/alert';
-import type { TabsPaneContext } from 'element-plus'
-import { getTemplateList, createUserTemplate, sendTemplateMsg, updateUserTemplate } from '@/api/templateApi';
-import { getUserTemplateList } from '@/api/messageApi';
+import {
+  TemplateInfo,
+  TemplateHistory,
+  SendMsgInfo,
+  HeadersArrInfo,
+} from "@/vo";
+import { CommonAlert } from "@/constant/alert/base";
+import { ShowAlert } from "@/components/alert";
+import type { TabsPaneContext } from "element-plus";
+import {
+  getTemplateList,
+  createUserTemplate,
+  sendTemplateMsg,
+  updateUserTemplate,
+} from "@/api/templateApi";
+import { getUserTemplateList } from "@/api/messageApi";
 import { UserInfo } from "@/utils/Settings";
-import { setWaiting, removeWaiting } from '@/utils/loadingUtil';
-import { setSessionUserInfo } from '@/utils/Storage';
-import { VueDraggable } from 'vue-draggable-plus';
-import TemplateMessage from '@/components/TemplateMessage.vue';
-import Storage from '@/utils/Storage';
+import { setWaiting, removeWaiting } from "@/utils/loadingUtil";
+import { setSessionUserInfo } from "@/utils/Storage";
+import { VueDraggable } from "vue-draggable-plus";
+import TemplateMessage from "@/components/TemplateMessage.vue";
+import Storage from "@/utils/Storage";
+
+const SEND_SUCCESS_RESULT = "complete";
 
 const router = useRouter();
-const templateTitle = ref<string>('');
-const templateElement = ref<string>('');
+const templateTitle = ref<string>("");
+const templateElement = ref<string>("");
 const firstSearch = ref<boolean>(true);
 const isEdit = ref<boolean>(false);
 const editValue = ref<TemplateHistory>({});
@@ -28,28 +47,27 @@ const headersArr = reactive<HeadersArrInfo[]>([]);
 const commonTemplate = ref<TemplateInfo>({});
 const previewTemplate = ref<TemplateHistory>({});
 const TemplateList = reactive<TemplateInfo[]>([]);
-const templateMessageData = useState<any>('templateMessageData', () => { });
+const templateMessageData = useState<any>("templateMessageData", () => {});
 
 const trash = ref<any[]>([]);
 
 const getTempList = async () => {
   try {
     const info: TemplateInfo = {};
-    info.name = '';
+    info.name = "";
     const res: any = await getTemplateList(info);
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       TemplateList.push(...result.data);
       getLastReport();
     }
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 const getLastReport = async () => {
   try {
     const info: TemplateHistory = {};
-    info.content = '';
+    info.content = "";
     info.userId = UserInfo.userId;
     info.iPageCount = 20;
     info.iStart = 0;
@@ -57,20 +75,20 @@ const getLastReport = async () => {
       const res: any = await getUserTemplateList(info);
       let result = JSON.parse(res.data.value);
       if (isEdit.value) {
-        TemplateList.forEach(data => {
+        TemplateList.forEach((data) => {
           if (data.name === editValue.value.templateName) {
             reportName.value = data.nid as number;
             refreshTemplate(data);
           }
-        })
+        });
         getReportContent(editValue.value?.content as string);
       } else {
-        TemplateList.forEach(data => {
+        TemplateList.forEach((data) => {
           if (data.name === result.data[0].templateName) {
             reportName.value = data.nid as number;
             refreshTemplate(data);
           }
-        })
+        });
       }
       firstSearch.value = false;
     } else {
@@ -79,29 +97,40 @@ const getLastReport = async () => {
       let result = JSON.parse(res.data.value);
       if (!result.error) {
         if (result.data.length === 0) {
-          ShowAlert(CommonAlert.NO_LAST_MSG, 1)
+          ShowAlert(CommonAlert.NO_LAST_MSG, 1);
         }
-        getReportContent(result.data[0].content)
+        getReportContent(result.data[0].content);
       }
     }
-  } catch (error) {
-  }
-}
+  } catch (error) {}
+};
 
 const sendTemplate = async (nid: number) => {
   try {
     setWaiting();
     const res: any = await sendTemplateMsg(nid);
-    let result = JSON.parse(res.data.value);
+    const innerValue = res.data.value;
+    let result = null;
+    if (innerValue === SEND_SUCCESS_RESULT) {
+      result = res.data.value;
+    } else if (typeof innerValue === "string") {
+      result = JSON.parse(res.data.value);
+    }
+    removeWaiting();
     if (!result.error) {
-      removeWaiting();
       if (!isEdit) {
-        ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) })
+        ShowAlert(CommonAlert.MSG_SEND_SUCCESS, 0, () => {
+          router.push({ path: "/messageMain", query: { type: "search" } });
+        });
       } else {
-        ShowAlert(CommonAlert.EDIT_DATA_SUCCESS, 0, () => { router.push({ path: '/messageMain', query: { type: 'search' } }) });
+        ShowAlert(CommonAlert.EDIT_DATA_SUCCESS, 0, () => {
+          router.push({ path: "/messageMain", query: { type: "search" } });
+        });
       }
     }
   } catch (error) {
+    removeWaiting();
+    ShowAlert(CommonAlert.SOMETHING_ERROR, 3);
   }
 };
 
@@ -109,12 +138,20 @@ const saveReport = async () => {
   try {
     setWaiting();
     const res: any = await createUserTemplate(createReport());
-    let result = JSON.parse(res.data.value);
+    removeWaiting();
+    const innerValue = res.data.value;
+    let result = null;
+    if (typeof innerValue === "string") {
+      result = JSON.parse(res.data.value);
+    } else if (typeof innerValue === "object") {
+      result = innerValue;
+    }
     if (!result.error) {
-      removeWaiting();
-      sendTemplate(result.data.nid)
+      sendTemplate(result.data.nid);
     }
   } catch (error) {
+    removeWaiting();
+    ShowAlert(CommonAlert.SOMETHING_ERROR, 3);
   }
 };
 
@@ -128,19 +165,18 @@ const updateTemplate = async () => {
     let result = JSON.parse(res.data.value);
     if (!result.error) {
       removeWaiting();
-      sendTemplate(info.nid)
+      sendTemplate(info.nid);
     }
-  } catch (error) {
-  }
-}
+  } catch (error) {}
+};
 
 onMounted(() => {
   let currentTheme = Storage.getLocalItem("svelte-theme") ?? "ux-green-light";
-  document.documentElement.setAttribute('data-bs-theme', currentTheme);
+  document.documentElement.setAttribute("data-bs-theme", currentTheme);
   window.addEventListener("message", themeChangeHandler, false);
   const urlString = new URL(window.location.href);
   const userSession: any = {};
-  userSession.id = urlString.searchParams.get('userId');
+  userSession.id = urlString.searchParams.get("userId");
   if (userSession.id) {
     setSessionUserInfo(userSession);
   }
@@ -150,7 +186,7 @@ onMounted(() => {
     isEdit.value = true;
   }
   getTempList();
-})
+});
 
 function themeChangeHandler(e: MessageEvent) {
   if (e.data.type === "theme-changed") {
@@ -160,12 +196,12 @@ function themeChangeHandler(e: MessageEvent) {
 
 function onBtnSendClickHandler() {
   try {
-    elementsArr.forEach(data => {
+    elementsArr.forEach((data) => {
       data.headersArr.forEach((arr: HeadersArrInfo[]) => {
         try {
           arr.forEach((info, index) => {
             if (!info.inputValue && index === 0) {
-              ShowAlert(`${data.value}中${info.value}未填写!`, 1)
+              ShowAlert(`${data.value}中${info.value}未填写!`, 1);
               throw new Error();
             }
           });
@@ -174,8 +210,7 @@ function onBtnSendClickHandler() {
       });
     });
     saveReport();
-  } catch (e) {
-  }
+  } catch (e) {}
 }
 
 function onBtnSaveClickHandler() {
@@ -183,7 +218,7 @@ function onBtnSaveClickHandler() {
 }
 
 function onBtnBackClickHandler() {
-  router.push({ path: '/messageMain', query: { type: 'search' } });
+  router.push({ path: "/messageMain", query: { type: "search" } });
 }
 
 function onBtnFillUpClickHandler() {
@@ -199,7 +234,7 @@ function getReportContent(msgInfo: string) {
   elementsArr.forEach((data, index) => {
     for (let i = 0; i < historyMsg[index].list.length - 1; i++) {
       if (data.headersArr.length < historyMsg[index].list.length)
-        data.headersArr.push(JSON.parse(JSON.stringify(headersArr)))
+        data.headersArr.push(JSON.parse(JSON.stringify(headersArr)));
     }
   });
   elementsArr.forEach((data, index) => {
@@ -217,7 +252,7 @@ function createReport() {
   info.userId = UserInfo.userId;
   info.templateId = reportName.value;
   const sendContent: SendMsgInfo[] = [];
-  elementsArr.forEach(data => {
+  elementsArr.forEach((data) => {
     const contentInfo: SendMsgInfo = {};
     const listsArr: string[][] = [];
     const typesArr: string[][] = [];
@@ -225,7 +260,7 @@ function createReport() {
     data.headersArr.forEach((arr: HeadersArrInfo[]) => {
       const inputValueArr: string[] = [];
       const inputSelectedTypeArr: string[] = [];
-      arr.forEach(info => {
+      arr.forEach((info) => {
         inputValueArr.push(info.inputValue as string);
         inputSelectedTypeArr.push(info.selectedType as string);
       });
@@ -252,63 +287,119 @@ function refreshTemplate(info: TemplateInfo) {
   elementsArr.push(...JSON.parse(info?.element as string));
   headersArr.push(...JSON.parse(info?.title as string));
   headersArr.forEach((data) => {
-    data.inputValue = '';
-    data.type = (data.type as string).split(',');
+    data.inputValue = "";
+    data.type = (data.type as string).split(",");
     data.selectedType = data.type[0];
-  })
-  elementsArr.forEach(data => {
+  });
+  elementsArr.forEach((data) => {
     data.headersArr = [JSON.parse(JSON.stringify(headersArr))];
-  })
+  });
 }
 
 function onBtnTabChangeClickHandler(tab: TabsPaneContext) {
-  TemplateList.forEach(element => {
-    if (element.nid === tab.props.name)
-      refreshTemplate(element);
+  TemplateList.forEach((element) => {
+    if (element.nid === tab.props.name) refreshTemplate(element);
   });
 }
 
 function onBtnPreviewClickHandler() {
   previewTemplate.value = createReport();
 }
-
 </script>
 <template>
   <client-only>
     <div class="header">
       <div class="tabs">
-        <el-tabs v-if="!isEdit" v-model="reportName" type="card" @tab-click="onBtnTabChangeClickHandler">
-          <el-tab-pane v-for="(item, index) in TemplateList" :key="index" :label="item.name" :name="item.nid" />
+        <el-tabs
+          v-if="!isEdit"
+          v-model="reportName"
+          type="card"
+          @tab-click="onBtnTabChangeClickHandler"
+        >
+          <el-tab-pane
+            v-for="(item, index) in TemplateList"
+            :key="index"
+            :label="item.name"
+            :name="item.nid"
+          />
         </el-tabs>
       </div>
       <div class="right-btn">
-        <Button class='btn-icon' @click="onBtnBackClickHandler">返回</Button>
+        <Button class="btn-icon" @click="onBtnBackClickHandler">返回</Button>
       </div>
     </div>
     <div class="main-flex">
       <div class="content-border">
         <div v-for="(part, index) in elementsArr" :key="index">
-          <div style="display: flex;">
+          <div style="display: flex">
             <div class="reoprt-element-text">
               <el-text>{{ part.value }}</el-text>
             </div>
-            <Button class='add-types-btn' :btnIcon="Plus" @click="onBtnAddLineClickHandler(part.headersArr)"></Button>
+            <Button
+              class="add-types-btn"
+              :btnIcon="Plus"
+              @click="onBtnAddLineClickHandler(part.headersArr)"
+            ></Button>
           </div>
-          <VueDraggable v-model="part.headersArr" forceFallback
-            :group="{ name: 'report', pull: part.headersArr.length > 1 }" ghostClass="ghost" delay="300">
-            <div v-for="(content, index) in part.headersArr" :key="index" class="section-border">
-              <div v-for="(unit, indexs) in content" :key="indexs" class="content-format-title" v-show="indexs === 0">
-                <div class="content-format-com box-top-right" style="margin: 0.0625rem 0rem; height: 32px">
-                  <el-input v-model="unit.inputValue" :placeholder="unit.value" />
+          <VueDraggable
+            v-model="part.headersArr"
+            forceFallback
+            :group="{ name: 'report', pull: part.headersArr.length > 1 }"
+            ghostClass="ghost"
+            delay="300"
+          >
+            <div
+              v-for="(content, index) in part.headersArr"
+              :key="index"
+              class="section-border"
+            >
+              <div
+                v-for="(unit, indexs) in content"
+                :key="indexs"
+                class="content-format-title"
+                v-show="indexs === 0"
+              >
+                <div
+                  class="content-format-com box-top-right"
+                  style="margin: 0.0625rem 0rem; height: 32px"
+                >
+                  <el-input
+                    v-model="unit.inputValue"
+                    :placeholder="unit.value"
+                  />
                 </div>
               </div>
-              <div v-for="(unit, indexs) in content" :key="indexs" class="content-format" v-show="indexs > 0">
+              <div
+                v-for="(unit, indexs) in content"
+                :key="indexs"
+                class="content-format"
+                v-show="indexs > 0"
+              >
                 <div class="content-format-com box-top-right">
-                  <el-input v-if="unit.selectedType === 'input'" v-model="unit.inputValue" :placeholder="unit.value" />
-                  <el-input v-if="unit.selectedType === 'batchInput'" v-model="unit.inputValue"
-                    :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" :placeholder="unit.value" />
-                  <el-select class="component-select" v-model="unit.selectedType" :disabled="unit.type.length === 1">
-                    <el-option class="options" v-for="item in unit.type" :key="item" :label="item" :value="item" />
+                  <el-input
+                    v-if="unit.selectedType === 'input'"
+                    v-model="unit.inputValue"
+                    :placeholder="unit.value"
+                  />
+                  <el-input
+                    v-if="unit.selectedType === 'batchInput'"
+                    v-model="unit.inputValue"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    type="textarea"
+                    :placeholder="unit.value"
+                  />
+                  <el-select
+                    class="component-select"
+                    v-model="unit.selectedType"
+                    :disabled="unit.type.length === 1"
+                  >
+                    <el-option
+                      class="options"
+                      v-for="item in unit.type"
+                      :key="item"
+                      :label="item"
+                      :value="item"
+                    />
                   </el-select>
                 </div>
               </div>
@@ -316,18 +407,38 @@ function onBtnPreviewClickHandler() {
           </VueDraggable>
         </div>
       </div>
-      <div class='transform-btn-location'>
+      <div class="transform-btn-location">
         <div v-if="!isEdit">
-          <Button class='btn-icon operate-btn' @click="onBtnFillUpClickHandler">填充上次消息</Button>
+          <Button class="btn-icon operate-btn" @click="onBtnFillUpClickHandler"
+            >填充上次消息</Button
+          >
         </div>
         <div>
-          <Button class='btn-icon operate-btn' @click="onBtnPreviewClickHandler">预览消息</Button>
+          <Button class="btn-icon operate-btn" @click="onBtnPreviewClickHandler"
+            >预览消息</Button
+          >
         </div>
         <div>
-          <Button v-if="isEdit" class='btn-icon operate-btn' @click="onBtnSaveClickHandler">发送</Button>
-          <Button v-else class='btn-icon operate-btn' @click="onBtnSendClickHandler">发送</Button>
+          <Button
+            v-if="isEdit"
+            class="btn-icon operate-btn"
+            @click="onBtnSaveClickHandler"
+            >发送</Button
+          >
+          <Button
+            v-else
+            class="btn-icon operate-btn"
+            @click="onBtnSendClickHandler"
+            >发送</Button
+          >
         </div>
-        <VueDraggable class="drag-box" v-model="trash" group="report" disabled ghostClass="ghost">
+        <VueDraggable
+          class="drag-box"
+          v-model="trash"
+          group="report"
+          disabled
+          ghostClass="ghost"
+        >
         </VueDraggable>
       </div>
       <div class="preview-border">
@@ -364,7 +475,6 @@ function onBtnPreviewClickHandler() {
 .content-format {
   display: flex;
   margin: 0.0625rem;
-  flex-grow: 20;
 }
 
 .content-format-com {
@@ -433,7 +543,7 @@ function onBtnPreviewClickHandler() {
   margin: 0.5625rem 0.3125rem 0.0625rem 0.0625rem;
 }
 
-.add-types-btn>span>i {
+.add-types-btn > span > i {
   margin-left: -0.375rem;
 }
 
@@ -460,8 +570,8 @@ function onBtnPreviewClickHandler() {
   color: var(--iux-theme-font-color);
   font-size: 1rem;
   font-weight: 600;
-  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif,
-    "微软雅黑";
+  font-family:
+    "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif, "微软雅黑";
   margin: 0.625rem;
   width: 100%;
   height: 1.875rem;
@@ -485,7 +595,7 @@ function onBtnPreviewClickHandler() {
   margin-bottom: 0rem;
 }
 
-.delete-btn>span>i {
+.delete-btn > span > i {
   margin-left: 0rem;
 }
 

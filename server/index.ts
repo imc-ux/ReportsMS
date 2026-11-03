@@ -3,7 +3,9 @@ import { UseFetchOptions, useFetch } from "nuxt/app";
 type Methods = "GET" | "POST";
 
 const SERVER_URL = "http://109.14.6.43:6636/ux/";
+// const SERVER_URL = "http://127.0.0.1:8080/ux/";
 // const SERVER_URL = "http://109.14.6.243:7777/";
+// const SERVER_URL = "http://109.14.6.245:7777/";
 
 class HttpRequest {
   request(url: string, method: Methods, data: any) {
@@ -22,6 +24,8 @@ class HttpRequest {
         }
       }
       if (method === "POST") {
+        let jsonString: any = encodeURIComponent(JSON.stringify(data));
+        newOptions.params = { jsonString };
         newOptions.body = data;
       }
       useFetch(url, newOptions)
